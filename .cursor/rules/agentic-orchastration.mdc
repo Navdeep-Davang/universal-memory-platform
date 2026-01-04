@@ -56,6 +56,7 @@ No manual specification needed. Role detection is automatic.
      - [ ] No new linter errors introduced
      - [ ] Verification performed (describe method in notes)
      - [ ] Ready for Master QA
+   - **Master Agent Guidance (Review Feedback):** (Placeholder for QA feedback in future cycles)
 
 5. I ensure **ZERO file overlaps** between sub-agents
 6. I return ready-to-use invocation commands for each sub-agent
@@ -64,9 +65,16 @@ No manual specification needed. Role detection is automatic.
 1. Read provided `master-agent.md` (current state)
 2. Read all provided `sub-agent-*.md` files (completion status, notes, blockers)
 3. **Quality Assurance (QA):** Verify all tasks are marked complete AND check the `Subtask Completion Notes` for verification evidence. Do not just take the sub-agent's word; verify the changes in the actual files.
-4. Check for any file conflicts, logic gaps, or blockers across all sub-agents.
-5. Consolidate changes conceptually and ensure the overall feature meets the original architecture/requirements.
-6. Either:
+4. **In-Place Feedback Loop (If Flaws Found):**
+   - If a task/subtask has flaws, DO NOT mark it as complete in your mind.
+   - Append a `### Master Agent Guidance (Review Feedback)` section to the end of the affected `sub-agent-N.md`.
+   - Document the specific flaws and required refactoring in this section.
+   - **Reset Task Status:** In the same `sub-agent-N.md` file, change `[X]` back to `[ ]` for all flawed tasks/subtasks.
+   - Update the sub-agent's Status field back to `IN-PROGRESS`.
+   - Inform the user that flaws were found and the sub-agent has been updated with feedback.
+5. Check for any file conflicts, logic gaps, or blockers across all sub-agents.
+6. Consolidate changes conceptually and ensure the overall feature meets the original architecture/requirements.
+7. Either:
    - **Create CYCLE-[N+1] assignments** (if more work remains):
      - Analyze remaining unstarted tasks from original action plan
      - Identify newly parallelizable work
@@ -86,6 +94,7 @@ No manual specification needed. Role detection is automatic.
 
 **Automatic Behavior:**
 - Read the entire `sub-agent-N.md` file provided
+- **Check for Feedback:** ALWAYS check for a `### Master Agent Guidance (Review Feedback)` section at the end of the file. If it exists, these items are your HIGHEST priority.
 - **Strategic Alignment:** Analyze the `Strategic Context & Prompts` section first. Use your intelligence to align your implementation with this guidance, treating tasks not just as labor but as objectives to be achieved within this context.
 - Understand the exact scope (What You Own section)
 - Understand what NOT to touch (What You DON'T Touch section)
