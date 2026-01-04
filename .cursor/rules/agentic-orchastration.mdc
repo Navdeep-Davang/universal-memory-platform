@@ -33,6 +33,7 @@ No manual specification needed. Role detection is automatic.
 2. I create: `doc/Workspace/[agentic-flow-name]/` directory structure
 3. I generate complete `master-agent.md` with:
    - Executive Summary (what is being built)
+   - Source Reference (link to original architecture/action plan files)
    - Orchestration Metadata (phases, sub-agents count, current cycle, completion %)
    - Architecture & Constraints (dependency map between tasks)
    - Current Distribution for CYCLE-1 (which sub-agent owns which tasks)

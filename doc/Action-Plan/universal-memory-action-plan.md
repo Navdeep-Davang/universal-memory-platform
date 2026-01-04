@@ -12,101 +12,102 @@
 
 ### GCP Infrastructure & FastAPI Setup
 
-- [ ] **Task 1.1:** Create GCP Project & Cloud Services
-  - [ ] Create GCP project with appropriate naming
-  - [ ] Enable Cloud Run API
-  - [ ] Enable Cloud SQL API  
-  - [ ] Enable Cloud Tasks API
-  - [ ] Set up GitHub repository with proper `.gitignore`
+- [X] **Task 1.1:** Create GCP Project & Cloud Services
+  - [X] Create GCP project with appropriate naming
+  - [X] Enable Cloud Run API
+  - [X] Enable Cloud SQL API  
+  - [X] Enable Cloud Tasks API
+  - [X] Set up GitHub repository with proper `.gitignore`
 
-- [ ] **Task 1.2:** Set up Memgraph Cloud Instance
-  - [ ] Create Memgraph Cloud instance (free tier for MVP)
-  - [ ] Configure connection credentials
-  - [ ] Test connection from local environment
-  - [ ] Document connection string in environment variables
+- [X] **Task 1.2:** Set up Memgraph Cloud Instance
+  - [X] Create Memgraph Cloud instance (free tier for MVP)
+  - [X] Configure connection credentials
+  - [X] Test connection from local environment
+  - [X] Document connection string in environment variables
 
-- [ ] **Task 1.3:** Create FastAPI Scaffold
-  - [ ] Initialize FastAPI project with proper structure:
+- [X] **Task 1.3:** Create FastAPI Scaffold
+  - [X] Initialize FastAPI project with proper structure:
     ```
     universal-memory-engine/
-    ├── core/
-    ├── strata/
-    ├── models/
-    ├── reasoning/
-    ├── retrieval/
-    ├── ranking/
-    ├── storage/
-    ├── operations/
-    ├── conflict_resolution/
-    ├── performance/
-    ├── api/
-    ├── config/
-    └── tests/
+    └── src/
+        ├── core/
+        ├── strata/
+        ├── models/
+        ├── reasoning/
+        ├── retrieval/
+        ├── ranking/
+        ├── storage/
+        ├── operations/
+        ├── conflict_resolution/
+        ├── performance/
+        ├── api/
+        ├── config/
+        └── tests/
     ```
-  - [ ] Create `api/rest_api.py` with basic endpoints:
+  - [X] Create `src/api/rest_api.py` with basic endpoints:
     - `POST /api/memories/add`
     - `GET /api/memories/{id}`
     - `POST /api/query`
     - `GET /health`
-  - [ ] Implement `api/middleware.py` with:
+  - [X] Implement `src/api/middleware.py` with:
     - CORS middleware
     - Error handling middleware
     - Logging middleware
-  - [ ] Create `config/defaults.py` with default settings
-  - [ ] Create `config/environment.py` for env variable handling
-  - [ ] Deploy initial version to Cloud Run
+  - [X] Create `src/config/defaults.py` with default settings
+  - [X] Create `src/config/environment.py` for env variable handling
+  - [X] Deploy initial version to Cloud Run
 
 ### Pydantic Schema Definition
 
-- [ ] **Task 1.4:** Create Core Node Models (`models/nodes.py`)
-  - [ ] `Entity` node type:
+- [X] **Task 1.4:** Create Core Node Models (`src/models/nodes.py`)
+  - [X] `Entity` node type:
     - `id`, `name`, `type`, `importance_score`, `created_at`, `updated_at`
-  - [ ] `Experience` node type:
+  - [X] `Experience` node type:
     - `id`, `agent_id`, `session_id`, `memory_type`, `content`, `embedding`, `created_at`, `updated_at`, `decision_date`, `confidence`, `source`, `reviewed_by`, `metadata`
-  - [ ] `Context` node type:
+  - [X] `Context` node type:
     - `id`, `name`, `description`, `importance_score`, `created_at`
-  - [ ] `Principle` node type:
+  - [X] `Principle` node type:
     - `id`, `content`, `confidence`, `evidence_count`, `created_at`
-  - [ ] `Goal` node type:
+  - [X] `Goal` node type:
     - `id`, `description`, `status`, `priority`, `created_at`
-  - [ ] `Constraint` node type:
+  - [X] `Constraint` node type:
     - `id`, `description`, `severity`, `created_at`
 
-- [ ] **Task 1.5:** Create Edge Models (`models/edges.py`)
-  - [ ] `MENTIONS` relationship (Memory → Entity)
-  - [ ] `BELONGS_TO` relationship (Memory → Context)
-  - [ ] `CAUSES` relationship (Experience → Principle)
-  - [ ] `CONFLICTS_WITH` relationship (Memory → Memory)
-  - [ ] `SUPPORTS` relationship (Memory → Memory)
-  - [ ] Relationship status tracking:
+- [X] **Task 1.5:** Create Edge Models (`src/models/edges.py`)
+  - [X] `MENTIONS` relationship (Memory → Entity)
+  - [X] `BELONGS_TO` relationship (Memory → Context)
+  - [X] `CAUSES` relationship (Experience → Principle)
+  - [X] `CONFLICTS_WITH` relationship (Memory → Memory)
+  - [X] `SUPPORTS` relationship (Memory → Memory)
+  - [X] Relationship status tracking:
     - `status` (pending | resolved | overridden)
     - `resolved_by`, `resolution_date`, `resolution_notes`
 
-- [ ] **Task 1.6:** Create Request/Response Models
-  - [ ] `models/memory_request.py`:
+- [X] **Task 1.6:** Create Request/Response Models
+  - [X] `src/models/memory_request.py`:
     - `MemoryRequest` (query, depth, breadth, reasoning_type, temporal_scope, confidence_threshold)
-  - [ ] `models/memory_result.py`:
+  - [X] `src/models/memory_result.py`:
     - `MemoryResult` (id, content, score, layer, paths_found, confidence, provenance, supporting_facts, contradictions, related_contexts)
-  - [ ] Add validation functions and example payloads
+  - [X] Add validation functions and example payloads
 
 ### Database Connection
 
-- [ ] **Task 1.7:** Create Storage Adapters
-  - [ ] `storage/adapters/graph_db_adapter.py`:
+- [X] **Task 1.7:** Create Storage Adapters
+  - [X] `src/storage/adapters/graph_db_adapter.py`:
     - Memgraph connection pool
     - `create_node()`, `create_edge()`, `get_node()`, `query()` methods
     - Error handling for connection failures
     - Atomic transaction support
-  - [ ] `storage/backend_registry.py`:
+  - [X] `src/storage/backend_registry.py`:
     - Adapter registration system
     - Adapter discovery mechanism
 
-- [ ] **Task 1.8:** Create Database Indexes
-  - [ ] Create index on `memory_id` (primary)
-  - [ ] Create index on `agent_id` (filtering)
-  - [ ] Create index on `created_at` (temporal)
-  - [ ] Prepare for HNSW vector index
-  - [ ] Prepare for full-text search index
+- [X] **Task 1.8:** Create Database Indexes
+  - [X] Create index on `memory_id` (primary)
+  - [X] Create index on `agent_id` (filtering)
+  - [X] Create index on `created_at` (temporal)
+  - [X] Prepare for HNSW vector index
+  - [X] Prepare for full-text search index
 
 **Deliverable:** Hello-world API responding + database schema ready
 
