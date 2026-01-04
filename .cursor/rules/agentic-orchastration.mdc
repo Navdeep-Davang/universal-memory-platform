@@ -41,14 +41,21 @@ No manual specification needed. Role detection is automatic.
    - Task Registry (all tasks mapped to assigned sub-agents)
    - Coordination Log (cycle tracking and decisions)
    - Quick Reference (invocation commands for sub-agents)
+   - **Strategic Guidance:** (Optional) Use your expertise to provide overarching prompts or context that applies to all sub-agents.
 
 4. I generate `sub-agent-1.md`, `sub-agent-2.md`, `sub-agent-3.md` (or more as needed) with:
    - Your Assignment section (which orchestration, which cycle)
+   - Strategic Context & Prompts (Master Agent: provide expert guidance, context, or specific prompts here to steer sub-agent intelligence)
    - Scope & Constraints (What You Own / What You DON'T Touch - explicit file list)
    - Your Tasks (hierarchical: Phase → Task → Subtask, all as checkboxes)
    - Progress Tracking (status fields)
    - Sub-Agent Communication & Blockers (for escalations)
-   - Implementation Checklist
+   - **Implementation Checklist:**
+     - [ ] Logic implemented as per Strategic Context
+     - [ ] Code follows project conventions
+     - [ ] No new linter errors introduced
+     - [ ] Verification performed (describe method in notes)
+     - [ ] Ready for Master QA
 
 5. I ensure **ZERO file overlaps** between sub-agents
 6. I return ready-to-use invocation commands for each sub-agent
@@ -56,9 +63,9 @@ No manual specification needed. Role detection is automatic.
 **If Consolidation (Master Agent Called Again With Updated Files):**
 1. Read provided `master-agent.md` (current state)
 2. Read all provided `sub-agent-*.md` files (completion status, notes, blockers)
-3. Verify all tasks are marked complete
-4. Check for any file conflicts or blockers
-5. Consolidate changes conceptually
+3. **Quality Assurance (QA):** Verify all tasks are marked complete AND check the `Subtask Completion Notes` for verification evidence. Do not just take the sub-agent's word; verify the changes in the actual files.
+4. Check for any file conflicts, logic gaps, or blockers across all sub-agents.
+5. Consolidate changes conceptually and ensure the overall feature meets the original architecture/requirements.
 6. Either:
    - **Create CYCLE-[N+1] assignments** (if more work remains):
      - Analyze remaining unstarted tasks from original action plan
@@ -79,6 +86,7 @@ No manual specification needed. Role detection is automatic.
 
 **Automatic Behavior:**
 - Read the entire `sub-agent-N.md` file provided
+- **Strategic Alignment:** Analyze the `Strategic Context & Prompts` section first. Use your intelligence to align your implementation with this guidance, treating tasks not just as labor but as objectives to be achieved within this context.
 - Understand the exact scope (What You Own section)
 - Understand what NOT to touch (What You DON'T Touch section)
 - Identify all assigned tasks and subtasks
@@ -87,22 +95,28 @@ No manual specification needed. Role detection is automatic.
 **Execution Rules:**
 1. Work on assigned tasks in order listed
 2. For each task, execute all subtasks
-3. Mark each subtask [ ] → [X] as you complete it
-4. Update "Overall Completion %" in Progress Tracking section
-5. Update "Last Update" timestamp frequently
-6. If you encounter a blocker:
+3. **Verification First:** Before marking a task as complete, verify it using relevant tools (`read_lints`, running tests if available, manual inspection of logic).
+4. Mark each subtask [ ] → [X] ONLY after verification.
+5. Update "Overall Completion %" in Progress Tracking section
+6. Update "Last Update" timestamp frequently
+7. If you encounter a blocker:
    - Document clearly in "Blockers" section
    - Do NOT proceed blindly
    - Wait for master to address or reassign
-7. If you need another sub-agent's code:
+8. If you need another sub-agent's code:
    - Add to "Questions for Master" section
    - Escalate immediately
    - Do NOT attempt to solve across scope boundaries
-8. When ALL tasks are marked [X]:
+9. **Definition of Done (DoD):** A task is only "COMPLETED" when:
+   - All logic is implemented as per strategic context.
+   - No new linter errors are introduced.
+   - Code follows project standards and conventions.
+   - Subtask Completion Notes detail the verification method used.
+10. When ALL tasks meet DoD:
    - Update Status field to: COMPLETED
-   - Fill "Subtask Completion Notes" with findings
-   - Provide completion report
-   - Ready for master consolidation
+   - Fill "Subtask Completion Notes" with findings and verification results.
+   - Provide completion report.
+   - Ready for master consolidation.
 
 **Critical Constraints:**
 - ONLY modify files listed in "What You Own"
