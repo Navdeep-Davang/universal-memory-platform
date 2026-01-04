@@ -119,38 +119,38 @@
 
 ### Entity Extraction
 
-- [ ] **Task 2.1:** Set up Embedding Adapter
-  - [ ] `storage/adapters/embedding_adapter.py`:
+- [X] **Task 2.1:** Set up Embedding Adapter
+  - [X] `src/storage/adapters/embedding_adapter.py`:
     - Integrate sentence-transformers (all-minilm-l6-v2)
-    - `embed_text(text)` → 384-dim vector
+    - `embed_text(text)` -> 384-dim vector
     - Batch processing (10 at a time)
     - Error handling for GPU OOM
 
-- [ ] **Task 2.2:** Set up LLM Adapter for Entity Extraction
-  - [ ] `storage/adapters/llm_adapter.py`:
+- [X] **Task 2.2:** Set up LLM Adapter for Entity Extraction
+  - [X] `src/storage/adapters/llm_adapter.py`:
     - Claude API integration for entity extraction
     - Rate limiting and retry logic
     - Response parsing
 
-- [ ] **Task 2.3:** Implement Experiential Stratum
-  - [ ] `strata/experiential_stratum.py`:
+- [X] **Task 2.3:** Implement Experiential Stratum
+  - [X] `src/strata/experiential_stratum.py`:
     - Extract entities from memory content using LLM
     - Return: name, type, confidence score
     - Check if entity exists (fuzzy match on name)
     - If new: create EntityNode; if exists: increment importance
-    - Create MENTIONS edge (Memory → Entity)
+    - Create MENTIONS edge (Memory -> Entity)
 
 ### Semantic Encoding & Clustering
 
-- [ ] **Task 2.4:** Set up Cache Adapter
-  - [ ] `storage/adapters/cache_adapter.py`:
+- [X] **Task 2.4:** Set up Cache Adapter
+  - [X] `src/storage/adapters/cache_adapter.py`:
     - Redis connection management
     - Cache embedding results (key: hash(content))
     - TTL management
 
-- [ ] **Task 2.5:** Implement Contextual Stratum
-  - [ ] `strata/contextual_stratum.py`:
-    - New memory → embed
+- [X] **Task 2.5:** Implement Contextual Stratum
+  - [X] `src/strata/contextual_stratum.py`:
+    - New memory -> embed
     - Vector search against existing contexts (Redis)
     - If similarity > 0.7: merge; else: create new context
     - Create BELONGS_TO edges
@@ -158,23 +158,23 @@
 
 ### Abstract Stratum & Ingestion Pipeline
 
-- [ ] **Task 2.6:** Implement Abstract Stratum
-  - [ ] `strata/abstract_stratum.py`:
+- [X] **Task 2.6:** Implement Abstract Stratum
+  - [X] `src/strata/abstract_stratum.py`:
     - Analyze if this is a new causal pattern
     - Link to existing principles or create new
     - Identify counter-examples if applicable
     - Extract reasoning chains if evident
 
-- [ ] **Task 2.7:** Implement Ingest Engine
-  - [ ] `core/ingest_engine.py`:
+- [X] **Task 2.7:** Implement Ingest Engine
+  - [X] `src/core/ingest_engine.py`:
     - Orchestrate ingestion pipeline
     - Parse incoming memory
     - Validate schema (Pydantic models)
     - Check for duplicates (hash-based)
     - Assign unique memory ID
 
-- [ ] **Task 2.8:** Implement Remember Operation
-  - [ ] `operations/remember_operation.py`:
+- [X] **Task 2.8:** Implement Remember Operation
+  - [X] `src/operations/remember_operation.py`:
     - Accept MemoryRequest
     - Validate + check duplicates
     - Call entity_extraction()
@@ -185,11 +185,11 @@
     - Return {memory_id, status, entities, context_id}
     - Comprehensive error handling
 
-- [ ] **Task 2.9:** Create POST /api/memories/add Endpoint
-  - [ ] Wire remember_operation to REST endpoint
-  - [ ] Add request validation
-  - [ ] Add response formatting
-  - [ ] Test end-to-end ingestion
+- [X] **Task 2.9:** Create POST /api/memories/add Endpoint
+  - [X] Wire remember_operation to REST endpoint
+  - [X] Add request validation
+  - [X] Add response formatting
+  - [X] Test end-to-end ingestion
 
 **Deliverable:** POST /api/memories/add working end-to-end
 
@@ -201,16 +201,16 @@
 
 ### Semantic Vector Search
 
-- [ ] **Task 3.1:** Implement Semantic Retriever
-  - [ ] `retrieval/semantic_retriever.py`:
+- [X] **Task 3.1:** Implement Semantic Retriever
+  - [X] `src/retrieval/semantic_retriever.py`:
     - Embed query using embedding_adapter
     - Memgraph vector search (HNSW algorithm)
     - Return top N by cosine similarity
     - Apply filters: confidence_threshold, temporal_scope
     - Return [(memory_id, content, score, layer)]
 
-- [ ] **Task 3.2:** Implement Temporal Retriever
-  - [ ] `retrieval/temporal_retriever.py`:
+- [X] **Task 3.2:** Implement Temporal Retriever
+  - [X] `src/retrieval/temporal_retriever.py`:
     - Filter by temporal window
     - Sort by recency
     - Apply confidence filter
@@ -218,12 +218,12 @@
 
 ### Keyword Search (BM25)
 
-- [ ] **Task 3.3:** Create Full-Text Search Index
-  - [ ] Add FTS index on memory content in Memgraph
-  - [ ] Add FTS index on entity names
+- [X] **Task 3.3:** Create Full-Text Search Index
+  - [X] Add FTS index on memory content in Memgraph
+  - [X] Add FTS index on entity names
 
-- [ ] **Task 3.4:** Implement Context Retriever
-  - [ ] `retrieval/context_retriever.py`:
+- [X] **Task 3.4:** Implement Context Retriever
+  - [X] `src/retrieval/context_retriever.py`:
     - Full-text search on query
     - Return top N by relevance score
     - Apply filters
@@ -231,10 +231,10 @@
 
 ### Result Preparation
 
-- [ ] **Task 3.5:** Implement Result Formatting
-  - [ ] Take semantic + keyword results
-  - [ ] Format as MemoryResult objects
-  - [ ] Add layer, paths_found, confidence, provenance
+- [X] **Task 3.5:** Implement Result Formatting
+  - [X] Take semantic + keyword results
+  - [X] Format as MemoryResult objects
+  - [X] Add layer, paths_found, confidence, provenance
 
 **Deliverable:** Two independent retrieval paths working (semantic + keyword)
 

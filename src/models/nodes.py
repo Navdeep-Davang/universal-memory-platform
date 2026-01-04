@@ -45,11 +45,9 @@ class Experience(BaseNode):
     confidence: Annotated[float, Field(ge=0.0, le=1.0, description="Confidence score from 0.0 to 1.0")]
     metadata: Dict = Field(default_factory=dict, description="Additional metadata")
 
-class Context(BaseModel):
-    id: str = Field(..., description="Unique identifier for the context")
+class Context(BaseNode):
     name: str = Field(..., description="Name of the context")
     importance_score: Annotated[float, Field(ge=0.0, le=1.0, description="Importance score from 0.0 to 1.0")]
-    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Principle(BaseNode):
     content: str = Field(..., description="The content of the principle")

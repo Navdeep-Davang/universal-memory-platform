@@ -3,5 +3,9 @@ uvicorn
 pydantic-settings
 loguru
 python-dotenv
-# Add other dependencies as needed
+sentence-transformers
+redis
+openai
+anthropic
+tenacity
 

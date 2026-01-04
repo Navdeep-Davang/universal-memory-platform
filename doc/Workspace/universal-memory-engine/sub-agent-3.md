@@ -1,53 +1,53 @@
-# Sub-Agent 3: Storage Layer & Indexing
+# Sub-Agent 3: Storage & Retrieval Foundation
 
 ## Your Assignment
-- **Orchestration:** Universal Memory Engine
-- **Cycle:** CYCLE-1 (Phase 1)
-- **Role:** Storage Engineer
+- **Orchestration:** universal-memory-engine
+- **Current Cycle:** CYCLE-2
+- **Status:** READY
+
+## Strategic Context & Prompts
+### Master Agent Guidance:
+You are responsible for the efficient retrieval of memories. Your work directly impacts the <300ms latency target.
+- **Vector Search:** Implement the HNSW search logic in `src/retrieval/semantic_retriever.py`.
+- **FTS:** Use Memgraph's full-text search capabilities for keyword-based retrieval.
+- **Optimization:** Ensure all indexes (vector, FTS, temporal) are correctly managed in `src/storage/index_manager.py`.
 
 ## Scope & Constraints
 ### What You Own:
-- `src/storage/` (adapters/graph_db_adapter.py, backend_registry.py, index_manager.py)
-- DB Index definitions
+- `src/retrieval/` (semantic_retriever.py, temporal_retriever.py, context_retriever.py)
+- `src/storage/` (index_manager.py, graph_db_adapter.py - maintain)
 
 ### What You DON'T Touch:
 - `src/api/`, `src/config/` (Owned by Sub-Agent 1)
 - `src/models/` (Owned by Sub-Agent 2)
+- `src/strata/` (Owned by Sub-Agent 2)
 
 ## Your Tasks
-### Phase 1: Storage Foundation
-- [X] **Task 1.7: Storage Adapters**
-    - [X] Implement `storage/adapters/graph_db_adapter.py`:
-      - Class `GraphDBAdapter` with `__init__`, `connect()`, `disconnect()`
-      - Methods: `create_node(label, properties)`, `create_edge(source_id, target_id, type, properties)`, `get_node(id)`, `run_query(cypher, params)`
-      - Implement a connection pool using `mgclient` or official `neo4j` Python driver if compatible with Memgraph.
-    - [X] Implement `storage/backend_registry.py`:
-      - A registry pattern to switch between different graph DB implementations (e.g., `MEMGRAPH`, `NEO4J`).
-- [X] **Task 1.8: Database Indexes**
-    - [X] Define the following indexes for Memgraph:
-      - `CREATE INDEX ON :Experience(id);`
-      - `CREATE INDEX ON :Experience(agent_id);`
-      - `CREATE INDEX ON :Experience(created_at);`
-      - `CREATE INDEX ON :Entity(name);`
-    - [X] Prepare vector index configuration (HNSW) for `Experience.embedding`.
-
-## Implementation Notes
-- **Parameterization:** All Cypher queries MUST use parameters to prevent injection. (Implemented in `run_query`, `create_node`, `create_edge`, `get_node`)
-- **Transactions:** Use context managers (`with` statement) to ensure sessions/transactions are closed properly. (Implemented in `run_query` and `execute_transaction`)
-- **Logging:** Log all query execution times and errors to the shared logging middleware. (Implemented using `logging` and timing in `run_query`)
-- **Memgraph Specifics:** Consult Memgraph documentation for HNSW index creation syntax. (Implemented in `IndexManager`)
+### Phase 3: Retrieval Paths
+- [X] **Task 3.1: Semantic Retriever**
+    - [X] Implement `src/retrieval/semantic_retriever.py`.
+    - [X] Logic for HNSW vector search against Memgraph.
+- [X] **Task 3.2: Temporal Retriever**
+    - [X] Implement `src/retrieval/temporal_retriever.py`.
+    - [X] Logic for filtering by time and sorting by recency.
+- [X] **Task 3.3: Database Indexes**
+    - [X] Update `src/storage/index_manager.py`.
+    - [X] Ensure primary, temporal, and full-text indexes are created.
+- [X] **Task 3.4: Context Retriever (FTS)**
+    - [X] Implement `src/retrieval/context_retriever.py`.
+    - [X] Use Memgraph FTS for entity and memory content keyword search.
+- [X] **Task 3.5: Result Formatting**
+    - [X] Implement shared utility for formatting raw DB results into `MemoryResult` objects.
 
 ## Progress Tracking
-- **Status:** COMPLETED
 - **Overall Completion:** 100%
+- **Current Task:** COMPLETED
 - **Last Update:** 2026-01-04
 
-## Sub-Agent Communication & Blockers
-- **Blockers:** None
-- **Questions for Master:** None
-
 ## Implementation Checklist
-- [X] Connection pool handles timeouts/retries
-- [X] Cypher queries are parameterized
-- [X] Atomic transaction support implemented
+- [X] Logic implemented as per Strategic Context
+- [X] Code follows project conventions (src. prefix imports)
+- [X] No new linter errors introduced
+- [X] Verification performed
+- [X] Ready for Master QA
 

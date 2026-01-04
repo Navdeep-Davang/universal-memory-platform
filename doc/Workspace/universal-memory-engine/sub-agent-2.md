@@ -1,50 +1,55 @@
-# Sub-Agent 2: Data Modeling & Schema
+# Sub-Agent 2: Data Architect & Strata Logic
 
 ## Your Assignment
-- **Orchestration:** Universal Memory Engine
-- **Cycle:** CYCLE-1 (Phase 1)
-- **Role:** Data Architect
+- **Orchestration:** universal-memory-engine
+- **Current Cycle:** CYCLE-2
+- **Status:** COMPLETED
+
+## Strategic Context & Prompts
+### Master Agent Guidance (Review Feedback):
+Your strata logic is currently using placeholders and calling non-existent methods on the `LLMAdapter`.
+- **Experiential Stratum:** You must implement the logic to construct a prompt for the LLM to extract entities, and parse the response. Use the `LLMAdapter` (which SA1 is updating to support JSON/structured responses).
+- **Contextual Stratum:** You must implement `_find_similar_context` using vector similarity search via the `db_adapter` and `embedding_adapter`. Returning `None` always is not acceptable.
+- **Abstract Stratum:** You must implement the logic to derive principles via LLM.
+- **Models:** Good work on refining the models.
 
 ## Scope & Constraints
 ### What You Own:
-- `src/models/` (nodes.py, edges.py, memory_request.py, memory_result.py)
+- `src/strata/` (experiential_stratum.py, contextual_stratum.py, abstract_stratum.py)
+- `src/models/` (Continue maintaining models/nodes.py, edges.py, etc.)
 
 ### What You DON'T Touch:
 - `src/api/`, `src/config/` (Owned by Sub-Agent 1)
 - `src/storage/` (Owned by Sub-Agent 3)
+- `src/core/ingest_engine.py` (Owned by Sub-Agent 1)
 
 ## Your Tasks
-### Phase 1: Schema Definition
-- [X] **Task 1.4: Core Node Models (`models/nodes.py`)**
-    - [X] Define `Entity`: `id: str`, `name: str`, `type: str`, `importance_score: float` (0.0-1.0), `created_at: datetime`, `updated_at: datetime`
-    - [X] Define `Experience`: `id: str`, `agent_id: str`, `session_id: str`, `memory_type: str`, `content: str`, `embedding: List[float]`, `created_at: datetime`, `updated_at: datetime`, `confidence: float`, `metadata: Dict`
-    - [X] Define `Context`: `id: str`, `name: str`, `importance_score: float`, `created_at: datetime`
-    - [X] Define `Principle`: `id: str`, `content: str`, `confidence: float`, `evidence_count: int`, `created_at: datetime`
-    - [X] Define `Goal`: `id: str`, `description: str`, `status: str`, `priority: int`, `created_at: datetime`
-    - [X] Define `Constraint`: `id: str`, `description: str`, `severity: str`, `created_at: datetime`
-- [X] **Task 1.5: Edge Models (`models/edges.py`)**
-    - [X] Define `MENTIONS`, `BELONGS_TO`, `CAUSES`, `CONFLICTS_WITH`, `SUPPORTS`
-    - [X] Add relationship status tracking: `status: Enum` (pending, resolved, overridden), `resolved_by: Optional[str]`, `resolution_date: Optional[datetime]`
-- [X] **Task 1.6: Request/Response Models**
-    - [X] Define `MemoryRequest` in `models/memory_request.py`: `query: str`, `depth: int`, `breadth: int`, `reasoning_type: str`, `temporal_scope: Optional[str]`, `confidence_threshold: float`
-    - [X] Define `MemoryResult` in `models/memory_result.py`: `id: str`, `content: str`, `score: float`, `layer: str`, `paths_found: List[str]`, `confidence: float`, `provenance: str`
-
-## Implementation Notes
-- **Pydantic V2:** Used `Field` for descriptions and `Annotated` for constraints (e.g., `ge=0.0, le=1.0`).
-- **Enums:** Defined `MemoryType`, `Severity`, `GoalStatus`, `RelationshipType`, `RelationshipStatus`, and `ReasoningType`.
-- **Validation:** Used `Annotated` with `Field` for range validation. Added a `field_validator` for `updated_at` in `BaseNode`.
+### Phase 2: Ingestion Strata
+- [X] **Task 2.3: Experiential Stratum**
+    - [X] Implement `src/strata/experiential_stratum.py`.
+    - [X] Use `LLMAdapter` for entity extraction.
+    - [X] Logic for checking existing entities and updating importance.
+- [X] **Task 2.5: Contextual Stratum**
+    - [X] Implement `src/strata/contextual_stratum.py`.
+    - [X] Logic for semantic clustering and `BELONGS_TO` edges.
+- [X] **Task 2.6: Abstract Stratum**
+    - [X] Implement `src/strata/abstract_stratum.py`.
+    - [X] Logic for causal pattern detection and principle linking.
 
 ## Progress Tracking
-- **Status:** COMPLETED
 - **Overall Completion:** 100%
+- **Current Task:** Completed
 - **Last Update:** 2026-01-04
 
-## Sub-Agent Communication & Blockers
-- **Blockers:** None
-- **Questions for Master:** None
-
 ## Implementation Checklist
-- [X] All models use Pydantic V2
-- [X] Complex types (Enum, Datetime) handled correctly
-- [X] Validation functions added where necessary
+- [X] Logic implemented as per Strategic Context
+- [X] Code follows project conventions (src. prefix imports)
+- [X] No new linter errors introduced
+- [X] Verification performed
+- [X] Ready for Master QA
+
+## Subtask Completion Notes
+- **Experiential Stratum (Rework):** Implemented detailed LLM prompting for entity extraction (name, type, importance) and added robust JSON parsing for the response. Linked extracted entities to experiences with `MENTIONS` edges and handled updates to existing entity importance.
+- **Contextual Stratum (Rework):** Implemented `_find_similar_context` using Memgraph's vector search (`vector.search`). The logic now searches for the most similar experience and returns its associated context, ensuring better clustering.
+- **Abstract Stratum (Rework):** Implemented principle derivation using structured LLM prompts. Derived principles are linked to experiences via `SUPPORTS` edges, with stable IDs generated via content hashing.
 

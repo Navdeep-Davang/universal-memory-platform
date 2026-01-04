@@ -20,6 +20,14 @@ class IndexManager:
         ]
 
     @staticmethod
+    def get_fts_index_queries() -> List[str]:
+        """Returns queries for creating Full-Text Search indexes in Memgraph."""
+        return [
+            "CALL text.index.create('Experience', ['content']);",
+            "CALL text.index.create('Entity', ['name']);",
+        ]
+
+    @staticmethod
     def get_vector_index_query(label: str = "Experience", property_name: str = "embedding") -> str:
         """
         Returns the query for creating a vector index (HNSW) in Memgraph.
@@ -51,6 +59,15 @@ class IndexManager:
             logger.info(f"Successfully created vector index: {vector_query}")
         except Exception as e:
             logger.warning(f"Failed to create vector index: {vector_query}. Error: {e}")
+
+        # FTS indexes
+        for query in cls.get_fts_index_queries():
+            try:
+                adapter.run_query(query)
+                logger.info(f"Successfully executed: {query}")
+            except Exception as e:
+                # Common to ignore if index already exists
+                logger.debug(f"Could not create FTS index (may exist): {query}. Error: {e}")
 
 if __name__ == "__main__":
     # Example usage (would require environment variables in a real scenario)
