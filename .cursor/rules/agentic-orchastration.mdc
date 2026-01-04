@@ -1,0 +1,178 @@
+---
+title: Agentic Orchestration System - Role Detection
+description:
+globs:
+alwaysApply: true
+---
+
+## AUTOMATIC ROLE DETECTION
+
+When a file is provided in the chat, I automatically detect and activate the appropriate role:
+
+- **If `master-agent.md` is provided** → Activate as MASTER AGENT
+- **If `sub-agent-1.md` is provided** → Activate as SUB-AGENT-1
+- **If `sub-agent-2.md` is provided** → Activate as SUB-AGENT-2
+- **If `sub-agent-3.md` is provided** → Activate as SUB-AGENT-3
+- **If `sub-agent-N.md` is provided** → Activate as SUB-AGENT-N
+
+No manual specification needed. Role detection is automatic.
+
+---
+
+## MASTER AGENT ACTIVATION
+
+**Detection:** User provides `master-agent.md` file
+
+**Automatic Behavior:**
+- Read the entire `master-agent.md` file provided
+- Understand current orchestration state, cycle, and sub-agent statuses
+- Analyze all information in the master-agent.md file
+
+**If Initial Orchestration (No Workspace Exists):**
+1. User describes feature/workflow and provides architecture/requirements
+2. I create: `doc/Workspace/[agentic-flow-name]/` directory structure
+3. I generate complete `master-agent.md` with:
+   - Executive Summary (what is being built)
+   - Orchestration Metadata (phases, sub-agents count, current cycle, completion %)
+   - Architecture & Constraints (dependency map between tasks)
+   - Current Distribution for CYCLE-1 (which sub-agent owns which tasks)
+   - Sub-Agent Status table (READY/IN-PROGRESS/BLOCKED/COMPLETED for each)
+   - Task Registry (all tasks mapped to assigned sub-agents)
+   - Coordination Log (cycle tracking and decisions)
+   - Quick Reference (invocation commands for sub-agents)
+
+4. I generate `sub-agent-1.md`, `sub-agent-2.md`, `sub-agent-3.md` (or more as needed) with:
+   - Your Assignment section (which orchestration, which cycle)
+   - Scope & Constraints (What You Own / What You DON'T Touch - explicit file list)
+   - Your Tasks (hierarchical: Phase → Task → Subtask, all as checkboxes)
+   - Progress Tracking (status fields)
+   - Sub-Agent Communication & Blockers (for escalations)
+   - Implementation Checklist
+
+5. I ensure **ZERO file overlaps** between sub-agents
+6. I return ready-to-use invocation commands for each sub-agent
+
+**If Consolidation (Master Agent Called Again With Updated Files):**
+1. Read provided `master-agent.md` (current state)
+2. Read all provided `sub-agent-*.md` files (completion status, notes, blockers)
+3. Verify all tasks are marked complete
+4. Check for any file conflicts or blockers
+5. Consolidate changes conceptually
+6. Either:
+   - **Create CYCLE-[N+1] assignments** (if more work remains):
+     - Analyze remaining unstarted tasks from original action plan
+     - Identify newly parallelizable work
+     - Generate new `sub-agent-*.md` files with fresh assignments
+     - Update `master-agent.md` with CYCLE-[N+1] metadata
+     - Return new invocation commands
+   - **Declare feature COMPLETED** (if all work done):
+     - Update `master-agent.md` status to COMPLETED
+     - Archive all sub-agent files
+     - Return completion summary
+
+---
+
+## SUB-AGENT ACTIVATION
+
+**Detection:** User provides `sub-agent-N.md` file (where N = 1, 2, 3, etc.)
+
+**Automatic Behavior:**
+- Read the entire `sub-agent-N.md` file provided
+- Understand the exact scope (What You Own section)
+- Understand what NOT to touch (What You DON'T Touch section)
+- Identify all assigned tasks and subtasks
+- Work ONLY within the defined scope
+
+**Execution Rules:**
+1. Work on assigned tasks in order listed
+2. For each task, execute all subtasks
+3. Mark each subtask [ ] → [X] as you complete it
+4. Update "Overall Completion %" in Progress Tracking section
+5. Update "Last Update" timestamp frequently
+6. If you encounter a blocker:
+   - Document clearly in "Blockers" section
+   - Do NOT proceed blindly
+   - Wait for master to address or reassign
+7. If you need another sub-agent's code:
+   - Add to "Questions for Master" section
+   - Escalate immediately
+   - Do NOT attempt to solve across scope boundaries
+8. When ALL tasks are marked [X]:
+   - Update Status field to: COMPLETED
+   - Fill "Subtask Completion Notes" with findings
+   - Provide completion report
+   - Ready for master consolidation
+
+**Critical Constraints:**
+- ONLY modify files listed in "What You Own"
+- NEVER modify files owned by other sub-agents
+- NEVER cross scope boundaries without escalation
+- ALWAYS mark progress in your sub-agent-*.md file
+- ALWAYS update status fields
+
+---
+
+## WORKFLOW TRIGGERS
+
+### Trigger 1: Initial Orchestration (Master Agent First Use)
+```
+User says something like:
+"Create agentic orchestration for [Feature] with this architecture [doc]"
+
+.cursorrules detects: Feature description + architecture provided
+No .md files provided yet
+
+→ Activate MASTER AGENT MODE (Initial Orchestration)
+→ Create workspace and all .md files
+→ Return invocation commands
+```
+
+### Trigger 2: Sub-Agent Execution
+```
+User provides: sub-agent-1.md (or sub-agent-2.md, etc.)
+
+.cursorrules detects: sub-agent-*.md file provided
+
+→ Activate SUB-AGENT-N MODE
+→ Work on assigned tasks
+→ Mark progress as you go
+→ Report completion
+```
+
+### Trigger 3: Consolidation (Master Agent Second+ Use)
+```
+User provides: master-agent.md + all sub-agent-*.md files
+
+.cursorrules detects: master-agent.md provided (consolidation)
+
+→ Activate MASTER AGENT MODE (Consolidation)
+→ Review all sub-agent work
+→ Check for conflicts
+→ Create CYCLE-[N+1] or declare COMPLETED
+→ Return next steps
+```
+
+---
+
+## CONTEXT PRESERVATION
+
+Each activation is independent but consistent:
+- Master Agent always references `master-agent.md` as source of truth
+- Sub-Agents always reference their `sub-agent-N.md` file
+- All files use checkboxes [ ] for progress tracking
+- All files maintain clear scope boundaries
+- Updates are only written to the respective .md file
+
+---
+
+## NO ADDITIONAL INSTRUCTIONS NEEDED
+
+The .md files themselves contain all details:
+- `master-agent.md` tells Master what to do next
+- `sub-agent-*.md` tells Sub-Agents their exact tasks and scope
+- Progress is tracked in the files themselves
+- No separate documentation or instructions required
+
+This file only enables the role detection and activation.
+The .md files contain all operational details.
+
