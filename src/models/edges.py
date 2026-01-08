@@ -24,6 +24,7 @@ class Edge(BaseModel):
     weight: Annotated[float, Field(ge=0.0, le=1.0)] = Field(default=1.0, description="Strength of the relationship")
     resolved_by: Optional[str] = Field(None, description="ID of the agent or process that resolved this relationship")
     resolution_date: Optional[datetime] = Field(None, description="When the relationship was resolved")
+    resolution_notes: Optional[str] = Field(None, description="Notes about the resolution")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

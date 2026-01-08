@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     ANTHROPIC_API_KEY: Optional[str] = None
     REDIS_URL: str = "redis://localhost:6379/0"
+    
+    # Security
+    API_KEY: str = "dev-key-123"  # Default for development
+    RATE_LIMIT_PER_MINUTE: int = 60
 
     # GCP
     GCP_PROJECT_ID: Optional[str] = None

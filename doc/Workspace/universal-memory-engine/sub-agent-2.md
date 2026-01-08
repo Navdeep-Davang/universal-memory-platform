@@ -1,53 +1,55 @@
-# Sub-Agent 2: Ranking & Reasoning logic
+# Sub-Agent 2: Conflict Detection & Resolution
 
 ## Your Assignment
 - **Orchestration:** universal-memory-engine
-- **Current Cycle:** CYCLE-3
-- **Status:** COMPLETED
+- **Current Cycle:** CYCLE-4
+- **Status:** READY
 
 ## Strategic Context & Prompts
 ### Master Agent Guidance:
-Your focus is on the "intelligence" of the retrieval process—ensuring the most relevant memories are ranked highest.
-- **Fusion Ranking:** Implement a system that can combine scores from different retrieval paths (semantic, graph, temporal).
-- **Context-Aware Scoring:** Different types of queries (Causal, Strategic, etc.) should weight recency, relevance, and confidence differently.
-- **Pydantic Alignment:** Ensure all ranking outputs strictly follow the `MemoryResult` schema.
+You are responsible for the engine's ability to handle contradictions—the unique "Cognitive" feature of our platform.
+- **Contradiction Detection:** When new memories are added, identify if they contradict existing ones using vector similarity + LLM verification.
+- **Resolution Engine:** Create a structured way to track, analyze, and resolve these conflicts (Manual or Automated).
+- **Graph Consistency:** Use the `CONFLICTS_WITH` relationship to maintain a non-linear memory history.
 
 ## Scope & Constraints
 ### What You Own:
-- `src/ranking/` (relevance_ranker.py, recency_ranker.py, confidence_ranker.py, fusion_ranker.py)
-- `src/models/` (Update `MemoryResult` or `MemoryRequest` if ranking needs new fields)
+- `src/conflict_resolution/` (contradiction_detector.py, conflict_analyzer.py, resolution_engine.py)
+- `src/operations/contradict_operation.py`
+- `src/api/rest_api.py` (Conflict resolution endpoints: `/api/conflicts/*`)
+- `src/models/edges.py` (Update relationship status fields if needed)
 
 ### What You DON'T Touch:
-- `src/api/`, `src/config/` (Owned by Sub-Agent 1)
-- `src/core/recall_engine.py` (Owned by Sub-Agent 1)
-- `src/retrieval/` (Owned by Sub-Agent 3)
+- `sdk/python/` (Owned by Sub-Agent 1)
+- `dashboard/` (Owned by Sub-Agent 3)
+- `src/core/recall_engine.py` (Logic stabilized)
 
 ## Your Tasks
-### Phase 4: Ranking & Fusion
-- [x] **Task 4.4: Individual Rankers**
-    - [x] Implement `src/ranking/relevance_ranker.py`.
-    - [x] Implement `src/ranking/recency_ranker.py` (Time-decay scoring).
-    - [x] Implement `src/ranking/confidence_ranker.py`.
-- [x] **Task 4.5: Fusion Ranker**
-    - [x] Implement `src/ranking/fusion_ranker.py`.
-    - [x] Logic for combining scores from multiple paths.
-    - [x] Implement reasoning-type specific weighting (Task 4.5.1).
+### Phase 6: Conflict Detection System
+- [ ] **Task 6.1: Contradiction Detector**
+    - [ ] Implement `src/conflict_resolution/contradiction_detector.py`.
+    - [ ] Use vector search to find candidate conflicts.
+    - [ ] Implement LLM-based verification to distinguish between actual contradictions and different contexts.
+- [ ] **Task 6.2: Conflict Analyzer**
+    - [ ] Implement `src/conflict_resolution/conflict_analyzer.py`.
+    - [ ] Categorize conflict severity and suggest resolution strategies.
+- [ ] **Task 6.3: Resolution Engine**
+    - [ ] Implement `src/conflict_resolution/resolution_engine.py`.
+    - [ ] Manage `CONFLICTS_WITH` edges and resolution metadata (status, notes).
+- [ ] **Task 6.4: Contradict Operation**
+    - [ ] Implement `src/operations/contradict_operation.py` as a unified workflow.
+- [ ] **Task 6.5: Conflict API Endpoints**
+    - [ ] Implement `PUT /api/conflicts/{id}/resolve` and `GET /api/conflicts`.
 
 ## Progress Tracking
-- **Overall Completion:** 100%
-- **Current Task:** COMPLETED
+- **Overall Completion:** 0%
+- **Current Task:** T6.1
 - **Last Update:** 2026-01-08
 
 ## Implementation Checklist
-- [X] Logic implemented as per Strategic Context
-- [X] Code follows project conventions (src. prefix imports)
-- [X] No new linter errors introduced
-- [X] Verification performed
-- [X] Ready for Master QA
-
-### Master Agent Guidance (Review Feedback)
-Your implementation of `FusionRanker` has been successfully updated with a real ranking algorithm.
-- **Action:** Implemented weighted sum fusion and RRF-inspired path boosting in `src/ranking/fusion_ranker.py`.
-- **Weighting Profiles:** Implemented reasoning-type specific weighting (Task 4.5.1) for DESCRIPTIVE, CAUSAL, DEEP, etc.
-- **Status:** RE-WORK COMPLETE.
-
+- [ ] Logic implemented as per Strategic Context
+- [ ] LLM prompts for contradiction detection are high-precision
+- [ ] Conflict resolution state machine is clear (pending -> resolved -> overridden)
+- [ ] API endpoints follow REST conventions
+- [ ] Verification performed
+- [ ] Ready for Master QA

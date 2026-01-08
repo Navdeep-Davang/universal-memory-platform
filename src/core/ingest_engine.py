@@ -12,6 +12,7 @@ from src.storage.adapters.graph_db_adapter import GraphDBAdapter
 from src.strata.experiential_stratum import ExperientialStratum
 from src.strata.contextual_stratum import ContextualStratum
 from src.strata.abstract_stratum import AbstractStratum
+from src.operations.contradict_operation import ContradictOperation
 
 class IngestEngine:
     def __init__(
@@ -30,6 +31,9 @@ class IngestEngine:
         self.experiential = ExperientialStratum(self.db, self.llm_adapter)
         self.contextual = ContextualStratum(self.db, self.embedding_adapter)
         self.abstract = AbstractStratum(self.db, self.llm_adapter)
+        
+        # Initialize conflict detection
+        self.contradict_op = ContradictOperation(self.db, self.llm_adapter)
 
     async def ingest(
         self, 
@@ -92,6 +96,11 @@ class IngestEngine:
             # Abstract: Principle derivation
             principles = await self.abstract.process(experience)
             logger.debug(f"Abstract stratum processed: {len(principles)} principles derived")
+            
+            # 5. Conflict Detection
+            conflicts = await self.contradict_op.execute(experience)
+            if conflicts:
+                logger.info(f"Detected {len(conflicts)} conflicts for experience {experience.id}")
             
         except Exception as e:
             logger.error(f"Error during strata processing: {e}")

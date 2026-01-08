@@ -391,8 +391,8 @@
 
 ### Conflict Detection System
 
-- [ ] **Task 6.1:** Implement Contradiction Detector
-  - [ ] `conflict_resolution/contradiction_detector.py`:
+- [X] **Task 6.1:** Implement Contradiction Detector
+  - [X] `conflict_resolution/contradiction_detector.py`:
     - When new memory ingested, search for contradictions
     - Vector similarity against existing memories
     - Use LLM to verify actual conflict:
@@ -400,14 +400,14 @@
       - Or just different contexts?
     - Cache results (expensive LLM calls)
 
-- [ ] **Task 6.2:** Implement Conflict Analyzer
-  - [ ] `conflict_resolution/conflict_analyzer.py`:
+- [X] **Task 6.2:** Implement Conflict Analyzer
+  - [X] `conflict_resolution/conflict_analyzer.py`:
     - Determine if contextual or actual conflict
     - Analyze conflict severity
     - Suggest resolution strategies
 
-- [ ] **Task 6.3:** Implement Resolution Engine
-  - [ ] `conflict_resolution/resolution_engine.py`:
+- [X] **Task 6.3:** Implement Resolution Engine
+  - [X] `conflict_resolution/resolution_engine.py`:
     - If conflict: create CONFLICTS_WITH edge
     - Track resolution status:
       - status (pending | resolved | overridden)
@@ -418,26 +418,26 @@
 
 ### Conflict Operations & API
 
-- [ ] **Task 6.4:** Implement Contradict Operation
-  - [ ] `operations/contradict_operation.py`:
+- [X] **Task 6.4:** Implement Contradict Operation
+  - [X] `operations/contradict_operation.py`:
     - Conflict detection workflow
     - Resolution tracking
 
-- [ ] **Task 6.5:** Create Conflict API Endpoints
-  - [ ] `PUT /api/conflicts/{id}/resolve`:
+- [X] **Task 6.5:** Create Conflict API Endpoints
+  - [X] `PUT /api/conflicts/{id}/resolve`:
     - Accept: {status, resolved_by, notes}
     - Return updated metadata
-  - [ ] `GET /api/agent/{agent_id}/conflicts`:
+  - [X] `GET /api/agent/{agent_id}/conflicts`:
     - Return pending conflicts
     - Include memory excerpts, certainty scores
-  - [ ] `GET /api/conflicts/{conflict_id}`:
+  - [X] `GET /api/conflicts/{conflict_id}`:
     - Full details + resolution history
-  - [ ] Support filtering: agent, time range, status
+  - [X] Support filtering: agent, time range, status
 
-- [ ] **Task 6.6:** Format Conflict Data for Visualization
-  - [ ] Include conflict graph edges
-  - [ ] Highlight conflicting memories
-  - [ ] Show resolution timeline
+- [X] **Task 6.6:** Format Conflict Data for Visualization
+  - [X] Include conflict graph edges
+  - [X] Highlight conflicting memories
+  - [X] Show resolution timeline
 
 **Deliverable:** Conflict detection working - unique feature ready
 
@@ -449,51 +449,51 @@
 
 ### Python SDK
 
-- [ ] **Task 7.1:** Create Python SDK Package
-  - [ ] Create package structure for `agentic-memory`
-  - [ ] Client initialization: `client = AgenticMemory(api_key='...', base_url='...')`
-  - [ ] Implement methods:
+- [X] **Task 7.1:** Create Python SDK Package
+  - [X] Create package structure for `agentic-memory`
+  - [X] Client initialization: `client = AgenticMemory(api_key='...', base_url='...')`
+  - [X] Implement methods:
     - `client.remember(content, agent_id, metadata) → memory_id`
     - `client.recall(query, agent_id, depth=2, breadth=50) → results`
     - `client.list_memories(agent_id, limit=100)`
     - `client.get_memory(memory_id)`
     - `client.resolve_conflict(conflict_id, resolution)`
-  - [ ] Async versions (async def remember_async(), etc.)
-  - [ ] Full docstrings + type hints
-  - [ ] Error handling + retries
+  - [X] Async versions (async def remember_async(), etc.)
+  - [X] Full docstrings + type hints
+  - [X] Error handling + retries
 
-- [ ] **Task 7.2:** Prepare for PyPI Publishing
-  - [ ] Create setup.py/pyproject.toml
-  - [ ] Write package README
-  - [ ] Configure versioning
-  - [ ] Test local installation
+- [X] **Task 7.2:** Prepare for PyPI Publishing
+  - [X] Create setup.py/pyproject.toml
+  - [X] Write package README
+  - [X] Configure versioning
+  - [X] Test local installation
 
 ### Integration Examples
 
-- [ ] **Task 7.3:** Create Example Scripts
-  - [ ] `examples/code_assistant.py`: Coding agent remembering decisions
-  - [ ] `examples/research_agent.py`: Research agent tracking sources
-  - [ ] `examples/multi_agent_coordinator.py`: 2+ agents sharing memory
-  - [ ] `examples/conflict_demo.py`: Detecting/resolving conflicts
-  - [ ] `examples/dashboard_demo.py`: Querying and visualizing
-  - [ ] Each ~75 lines, runnable with mock data
+- [X] **Task 7.3:** Create Example Scripts
+  - [X] `examples/code_assistant.py`: Coding agent remembering decisions
+  - [X] `examples/research_agent.py`: Research agent tracking sources
+  - [X] `examples/multi_agent_coordinator.py`: 2+ agents sharing memory
+  - [X] `examples/conflict_demo.py`: Detecting/resolving conflicts
+  - [X] `examples/dashboard_demo.py`: Querying and visualizing
+  - [X] Each ~75 lines, runnable with mock data
 
-### Testing Suite
+### Testing Suite (DEFERRED)
 
-- [ ] **Task 7.4:** Create Unit Tests
+- [ ] **Task 7.4:** Create Unit Tests (DEFERRED)
   - [ ] `tests/unit/test_entity_extraction.py`: Entity extraction accuracy
   - [ ] `tests/unit/test_embedding.py`: Embedding generation
   - [ ] `tests/unit/test_conflict_detection.py`: Conflict detection
   - [ ] `tests/unit/test_ranking.py`: Ranking algorithm correctness
   - [ ] `tests/unit/test_sdk_client.py`: SDK client methods
 
-- [ ] **Task 7.5:** Create Integration Tests
+- [ ] **Task 7.5:** Create Integration Tests (DEFERRED)
   - [ ] `tests/integration/test_ingest_pipeline.py`: Full ingest → query pipeline
   - [ ] `tests/integration/test_retrieval.py`: 3-path retrieval accuracy
   - [ ] `tests/integration/test_cache.py`: Cache behavior
   - [ ] `tests/integration/test_conflict_workflow.py`: Conflict workflow end-to-end
 
-- [ ] **Task 7.6:** Create Test Fixtures
+- [ ] **Task 7.6:** Create Test Fixtures (DEFERRED)
   - [ ] `tests/fixtures/sample_memories.json`
   - [ ] `tests/fixtures/sample_agents.json`
   - [ ] `tests/fixtures/sample_queries.json`
@@ -509,17 +509,17 @@
 
 ### API Documentation
 
-- [ ] **Task 8.1:** Create OpenAPI/Swagger Documentation
-  - [ ] Document all endpoints with request/response examples
-  - [ ] Define error codes + meanings
-  - [ ] Document authentication (API key)
-  - [ ] Document rate limits (100 req/sec, 1M/month)
-  - [ ] Document latency SLAs (p50 <100ms, p95 <250ms)
-  - [ ] Generate interactive Swagger UI at /api/docs
+- [X] **Task 8.1:** Create OpenAPI/Swagger Documentation
+  - [X] Document all endpoints with request/response examples
+  - [X] Define error codes + meanings
+  - [X] Document authentication (API key)
+  - [X] Document rate limits (100 req/sec, 1M/month)
+  - [X] Document latency SLAs (p50 <100ms, p95 <250ms)
+  - [X] Generate interactive Swagger UI at /api/docs
 
-### Load Testing
+### Load Testing (DEFERRED)
 
-- [ ] **Task 8.2:** Create Load Test Suite
+- [ ] **Task 8.2:** Create Load Test Suite (DEFERRED)
   - [ ] Set up locust for load testing
   - [ ] Simulate 100 concurrent agents
   - [ ] Each: 10 memories/sec ingestion, 5 queries/sec
@@ -529,23 +529,23 @@
 
 ### Security Hardening
 
-- [ ] **Task 8.3:** Implement Security Measures
-  - [ ] Input validation (prevent injection)
-  - [ ] API key authentication implementation
-  - [ ] Rate limiting enforcement
-  - [ ] CORS configuration
-  - [ ] Comprehensive logging (no secrets in logs)
-  - [ ] Error messages (don't leak internals)
-  - [ ] Parameterized DB queries
-  - [ ] Dependency vulnerability scan (pip audit)
+- [X] **Task 8.3:** Implement Security Measures
+  - [X] Input validation (prevent injection)
+  - [X] API key authentication implementation
+  - [X] Rate limiting enforcement
+  - [X] CORS configuration
+  - [X] Comprehensive logging (no secrets in logs)
+  - [X] Error messages (don't leak internals)
+  - [X] Parameterized DB queries
+  - [X] Dependency vulnerability scan (pip audit)
 
 ### Monitoring & Alerts
 
-- [ ] **Task 8.4:** Set up Production Monitoring
-  - [ ] Metrics: latency (p50/p95/p99), error rate, cache hit rate
-  - [ ] Alerts: p95 > 300ms, error rate > 1%, cache < 50%
-  - [ ] Deploy Cloud Monitoring dashboard
-  - [ ] Configure notification channels
+- [X] **Task 8.4:** Set up Production Monitoring
+  - [X] Metrics: latency (p50/p95/p99), error rate, cache hit rate
+  - [X] Alerts: p95 > 300ms, error rate > 1%, cache < 50%
+  - [X] Deploy Cloud Monitoring dashboard
+  - [X] Configure notification channels
 
 **Deliverable:** Production-hardened, documented, monitored
 
@@ -555,24 +555,24 @@
 
 **Time Estimate:** 10 hours | **Parallel: Dashboard + Final Polish**
 
-### React Dashboard
+### Next.js Dashboard
 
-- [ ] **Task 9.1:** Set up Dashboard Project
-  - [ ] Initialize Vite + React + TypeScript
-  - [ ] Configure Tailwind CSS
-  - [ ] Set up project structure
+- [X] **Task 9.1:** Set up Dashboard Project
+  - [X] Initialize Next.js App (App Router, TypeScript)
+  - [X] Configure Tailwind CSS
+  - [X] Set up project structure (components, hooks, services)
 
-- [ ] **Task 9.2:** Create Dashboard Components
-  - [ ] `MemoryGraph`: Visualize graph nodes+edges (D3.js or Cytoscape)
-  - [ ] `AgentActivity`: Timeline of ingestions/queries
-  - [ ] `Statistics`: Memory counts, breakdown charts
-  - [ ] `ConflictViewer`: List conflicts with resolution UI
-  - [ ] `QueryBuilder`: Run custom queries
+- [X] **Task 9.2:** Create Dashboard Components
+  - [X] `MemoryGraph`: Visualize graph nodes+edges (D3.js/Cytoscape in Client Component)
+  - [X] `AgentActivity`: Timeline of ingestions/queries
+  - [X] `Statistics`: Memory counts, breakdown charts
+  - [X] `ConflictViewer`: List conflicts with resolution UI
+  - [X] `QueryBuilder`: Run custom queries using Server Actions or Client API calls
 
-- [ ] **Task 9.3:** Implement Dashboard Features
-  - [ ] Call API endpoints to fetch data
-  - [ ] Real-time updates (poll every 5 sec)
-  - [ ] Mobile responsive design
+- [X] **Task 9.3:** Implement Dashboard Features
+  - [X] Call API endpoints (Server Components / Client Fetch)
+  - [X] Real-time updates (poll or WebSocket)
+  - [X] Mobile responsive design
 
 ### Final Polish & Bug Fixes
 

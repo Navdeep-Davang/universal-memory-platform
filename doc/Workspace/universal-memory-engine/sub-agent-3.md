@@ -1,46 +1,47 @@
-# Sub-Agent 3: Graph Retrieval & DB Optimization
+# Sub-Agent 3: Visual Dashboard & UX (Next.js)
 
 ## Your Assignment
 - **Orchestration:** universal-memory-engine
-- **Current Cycle:** CYCLE-3
+- **Current Cycle:** CYCLE-4
 - **Status:** READY
 
 ## Strategic Context & Prompts
 ### Master Agent Guidance:
-You are responsible for the most complex part of the retrieval engine: the graph traversal and database-level optimizations.
-- **Graph Retrieval:** Implement the AKHLT (Adaptive K-Hop Limited Traversal) algorithm to find memories linked via entities.
-- **DB Optimization:** Optimize Cypher queries and index configurations for Memgraph to maintain the sub-300ms latency target.
-- **Multi-Path Coordination:** Implement the logic to merge results from semantic, keyword, and graph paths while removing duplicates.
+You are responsible for the human-facing interface of the Memory Engine using **Next.js**.
+- **Visual Clarity:** Build a dashboard that makes the complex graph of memories and entities intuitive to understand.
+- **Interactive Resolution:** Create a clean UI for users (or admins) to see conflicts and choose resolution strategies.
+- **Query Playbox:** Allow users to test the engine's recall performance directly from the UI.
+- **Next.js Advantage:** Use the App Router for clean navigation and Server Components for initial data fetching where appropriate.
 
 ## Scope & Constraints
 ### What You Own:
-- `src/retrieval/graph_retriever.py`
-- `src/core/graph_engine.py`
-- `src/performance/index_manager.py` (Advanced tuning)
-- `src/performance/query_optimizer.py`
+- `dashboard/` (Full Next.js + TypeScript + Tailwind project)
+- Graph visualization components (D3.js or Cytoscape) - use Client Components for canvas/SVG rendering.
+- UI components for Conflict resolution and Memory retrieval.
 
 ### What You DON'T Touch:
-- `src/api/`, `src/config/` (Owned by Sub-Agent 1)
-- `src/models/` (Owned by Sub-Agent 2)
-- `src/ranking/` (Owned by Sub-Agent 2)
-- `src/core/recall_engine.py` (Owned by Sub-Agent 1)
+- `src/` (Backend logic - only consume via API)
+- `sdk/python/` (Owned by Sub-Agent 1)
+- `src/conflict_resolution/` (Owned by Sub-Agent 2)
 
 ## Your Tasks
-### Phase 4: Graph Retrieval & Coordination
-- [X] **Task 4.1: Graph Retriever**
-    - [X] Implement `src/retrieval/graph_retriever.py`.
-    - [X] Logic for K-hop traversal starting from entities extracted from the query.
-- [X] **Task 4.2: Graph Engine**
-    - [X] Implement `src/core/graph_engine.py`.
-    - [X] Implement AKHLT algorithm with per-hop fan-out limiting (RE-WORK COMPLETE).
-- [X] **Task 4.3: Multi-Path Coordination**
-    - [X] Implement robust result merging and deduplication logic across paths.
-
-### Phase 5: DB Optimization
-- [X] **Task 5.2: Index Manager**
-    - [X] Implement advanced tuning for HNSW and FTS indexes.
-- [X] **Task 5.3: Query Optimizer**
-    - [X] Analyze and optimize slow Cypher queries.
+### Phase 9: Dashboard & Polish
+- [x] **Task 9.1: Set up Dashboard Project**
+    - [x] Initialize `npx create-next-app@latest` in `dashboard/` with App Router, TS, and Tailwind.
+    - [x] Configure environment variables for API connection.
+- [x] **Task 9.2: Memory Graph Visualization**
+    - [x] Build `MemoryGraph` client component to visualize nodes (Entity, Experience, Context) and edges.
+    - [x] Implement color-coding and basic interactivity (drag/zoom).
+- [x] **Task 9.3: Conflict Resolution Center**
+    - [x] Build a page to list pending conflicts using Next.js routing.
+    - [x] Implement a resolution interface that updates the backend.
+- [x] **Task 9.4: Query & Retrieval UI**
+    - [x] Build a search bar to test `POST /api/query`.
+    - [x] Display ranked results with provenance details and metadata.
+- [x] **Task 9.5: User Documentation**
+    - [x] Create a visual guide for the dashboard features.
+- [x] **Task 9.6: Final Deployment Preparation**
+    - [x] Ensure the dashboard is optimized for production (`next build`).
 
 ## Progress Tracking
 - **Overall Completion:** 100%
@@ -48,15 +49,10 @@ You are responsible for the most complex part of the retrieval engine: the graph
 - **Last Update:** 2026-01-08
 
 ## Implementation Checklist
-- [X] Logic implemented as per Strategic Context
-- [X] Code follows project conventions (src. prefix imports)
-- [X] No new linter errors introduced
-- [X] Verification performed
-- [X] Ready for Master QA
-
-### Master Agent Guidance (Review Feedback)
-Your implementation of `adaptive_k_hop_traversal` in `src/core/graph_engine.py` has been refactored to fully implement **per-hop fan-out limiting** using a tiered Cypher approach.
-- **Action:** Per-hop limiting implemented.
-- **Deduplication:** `Multi-Path Coordination` logic enhanced with normalized weights and robust ID handling.
-- **Status:** RE-WORK COMPLETE.
-
+- [x] Dashboard follows modern UX/UI practices
+- [x] Next.js App Router used correctly for organization
+- [x] Graph visualization is responsive and handles 100+ nodes smoothly
+- [x] API integration is robust and handles errors gracefully
+- [x] Code is well-structured and uses TypeScript types correctly
+- [x] Verification performed
+- [x] Ready for Master QA
