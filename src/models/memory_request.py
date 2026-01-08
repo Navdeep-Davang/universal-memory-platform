@@ -7,6 +7,7 @@ class ReasoningType(str, Enum):
     DEEP = "deep"
     TEMPORAL = "temporal"
     CAUSAL = "causal"
+    DESCRIPTIVE = "descriptive"
 
 class MemoryRequest(BaseModel):
     query: str = Field(..., description="The query string to search for in memory")

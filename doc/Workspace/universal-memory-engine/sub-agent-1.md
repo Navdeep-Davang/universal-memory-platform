@@ -2,45 +2,55 @@
 
 ## Your Assignment
 - **Orchestration:** universal-memory-engine
-- **Current Cycle:** CYCLE-2
-- **Status:** COMPLETED
+- **Current Cycle:** CYCLE-3
+- **Status:** READY
 
 ## Strategic Context & Prompts
-### Master Agent Guidance (Review Feedback):
-Your initial implementation of `LLMAdapter` is good, but Sub-Agent 2's strata logic depends on specific methods (`extract_entities`, `derive_principles`) that you haven't implemented.
-- **Action:** Either add these specific methods to `LLMAdapter` using well-defined prompts, OR provide a robust `complete()` method and coordinate with SA2 on how they should call it.
-- **Recommendation:** Implement a `call_as_json(prompt, system_prompt)` method that ensures the LLM returns valid JSON, as the strata need structured data.
+### Master Agent Guidance:
+You are responsible for the high-level orchestration of the recall process and ensuring performance targets are met via caching and monitoring.
+- **Recall Engine:** Implement the logic to concurrently call multiple retrieval paths and manage timeouts.
+- **Caching:** Use Redis to cache query results and frequently accessed nodes to hit the <300ms p95 target.
+- **Monitoring:** Implement latency tracking at each stage of the recall pipeline.
 
 ## Scope & Constraints
 ### What You Own:
-- `src/storage/adapters/` (embedding_adapter.py, llm_adapter.py, cache_adapter.py)
-- `src/core/ingest_engine.py`
-- `src/operations/remember_operation.py`
-- `src/api/rest_api.py` (wiring new endpoints)
-- Root files: `.gitignore`, `requirements.txt`, `README.md`, `.env.example`
+- `src/core/recall_engine.py`
+- `src/operations/recall_operation.py`
+- `src/api/rest_api.py` (Recall endpoints)
+- `src/performance/` (query_cache.py, latency_tracker.py, profiler.py)
+- `src/config/` (Maintain environment settings for Redis/Monitoring)
 
 ### What You DON'T Touch:
 - `src/models/` (Owned by Sub-Agent 2)
-- `src/strata/` (Owned by Sub-Agent 2 - but you will call them)
+- `src/strata/` (Owned by Sub-Agent 2)
 - `src/retrieval/` (Owned by Sub-Agent 3)
-- `src/storage/` (Other than adapters)
+- `src/ranking/` (Owned by Sub-Agent 2)
+- `src/storage/index_manager.py` (Owned by Sub-Agent 3)
 
 ## Your Tasks
-### Phase 2: Ingestion Pipeline (RE-WORK)
-- [X] **Task 2.1: Embedding Adapter**
-- [X] **Task 2.2: LLM Adapter (FIX REQUIRED)**
-    - [X] Update `src/storage/adapters/llm_adapter.py`.
-    - [X] Add `extract_entities(text)` and `derive_principles(text)` methods OR a generic `structured_completion(prompt, schema)` method.
-    - [X] Ensure JSON parsing is handled within the adapter.
-- [X] **Task 2.4: Cache Adapter**
-- [X] **Task 2.7: Ingest Engine**
-- [X] **Task 2.8: Remember Operation**
-- [X] **Task 2.9: API Integration**
+### Phase 4: Recall Orchestration
+- [X] **Task 4.6: Recall Engine**
+    - [X] Implement `src/core/recall_engine.py`.
+    - [X] Logic for launching retrieval paths concurrently using `asyncio.gather`.
+    - [X] Implement timeouts and error handling for individual paths.
+- [X] **Task 4.7: Recall Operation**
+    - [X] Implement `src/operations/recall_operation.py`.
+    - [X] Coordinate between Recall Engine and Ranking Layer.
+- [X] **Task 4.8: API Integration**
+    - [X] Wire recall operation to `POST /api/query`.
+
+### Phase 5: Performance & Caching
+- [X] **Task 5.1: Query Cache**
+    - [X] Implement `src/performance/query_cache.py` using Redis.
+- [X] **Task 5.4: Latency Tracking**
+    - [X] Implement `src/performance/latency_tracker.py`.
+- [X] **Task 5.5: Profiler**
+    - [X] Implement basic performance profiling for retrieval paths.
 
 ## Progress Tracking
 - **Overall Completion:** 100%
 - **Current Task:** COMPLETED
-- **Last Update:** 2026-01-04
+- **Last Update:** 2026-01-08
 
 ## Implementation Checklist
 - [X] Logic implemented as per Strategic Context
@@ -48,3 +58,10 @@ Your initial implementation of `LLMAdapter` is good, but Sub-Agent 2's strata lo
 - [X] No new linter errors introduced
 - [X] Verification performed
 - [X] Ready for Master QA
+
+### Master Agent Guidance (Review Feedback)
+Your implementation of `RecallEngine` and `RecallOperation` has been successfully updated to include the **Graph Retrieval path**.
+- **Action:** Integrated graph path into the recall orchestration.
+- **Coordination:** Successfully coordinated with SA3's `GraphRetriever`.
+- **Entity Extraction:** Implemented entity extraction via `LLMAdapter` during query preprocessing.
+- **Status:** RE-WORK COMPLETE.

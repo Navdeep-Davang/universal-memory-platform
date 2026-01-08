@@ -246,8 +246,8 @@
 
 ### Graph Traversal
 
-- [ ] **Task 4.1:** Implement Graph Retriever
-  - [ ] `retrieval/graph_retriever.py`:
+- [X] **Task 4.1:** Implement Graph Retriever
+  - [X] `src/retrieval/graph_retriever.py`:
     - Extract entities from query
     - Start from entity nodes in graph
     - BFS traversal up to K=3 hops
@@ -257,8 +257,8 @@
     - Visited set to prevent cycles
     - Timeout after 1 sec
 
-- [ ] **Task 4.2:** Implement Graph Engine
-  - [ ] `core/graph_engine.py`:
+- [X] **Task 4.2:** Implement Graph Engine
+  - [X] `src/core/graph_engine.py`:
     - Adaptive K-Hop Limited Traversal (AKHLT) algorithm
     - Path relevance scoring
     - Fan-out limiting
@@ -266,8 +266,8 @@
 
 ### Multi-Path Coordination
 
-- [ ] **Task 4.3:** Implement Multi-Path Coordinator
-  - [ ] `retrieval/multi_path_coordinator.py`:
+- [X] **Task 4.3:** Implement Multi-Path Coordinator
+  - [X] `src/retrieval/multi_path_coordinator.py`:
     - Launch all 3 retrievals concurrently (semantic, graph, temporal)
     - Wait for all to complete or timeout
     - Merge results from 3 paths
@@ -277,14 +277,14 @@
 
 ### Ranking System
 
-- [ ] **Task 4.4:** Implement Individual Rankers
-  - [ ] `ranking/relevance_ranker.py`: Relevance scoring
-  - [ ] `ranking/recency_ranker.py`: Time-decay scoring (1 / (1 + age_days/7))
-  - [ ] `ranking/confidence_ranker.py`: Confidence-based scoring
-  - [ ] `ranking/reasoning_fit_ranker.py`: Task-type fit scoring
+- [X] **Task 4.4:** Implement Individual Rankers
+  - [X] `src/ranking/relevance_ranker.py`: Relevance scoring
+  - [X] `src/ranking/recency_ranker.py`: Time-decay scoring (1 / (1 + age_days/7))
+  - [X] `src/ranking/confidence_ranker.py`: Confidence-based scoring
+  - [X] `src/ranking/reasoning_fit_ranker.py`: Task-type fit scoring
 
-- [ ] **Task 4.5:** Implement Fusion Ranker
-  - [ ] `ranking/fusion_ranker.py`:
+- [X] **Task 4.5:** Implement Fusion Ranker
+  - [X] `src/ranking/fusion_ranker.py`:
     - Combine scores from all rankers
     - Apply weights per reasoning type:
       - DESCRIPTIVE: 0.4×recency + 0.4×confidence + 0.2×semantic
@@ -299,8 +299,8 @@
 
 ### Recall Engine
 
-- [ ] **Task 4.6:** Implement Recall Engine
-  - [ ] `core/recall_engine.py`:
+- [X] **Task 4.6:** Implement Recall Engine
+  - [X] `src/core/recall_engine.py`:
     - Parse recall profile
     - Determine retrieval strategy based on params
     - Build query execution plan
@@ -309,16 +309,16 @@
     - Apply fusion ranking
     - Attach provenance
 
-- [ ] **Task 4.7:** Implement Recall Operation
-  - [ ] `operations/recall_operation.py`:
+- [X] **Task 4.7:** Implement Recall Operation
+  - [X] `src/operations/recall_operation.py`:
     - Execute full recall pipeline
     - Handle breadth expansion
     - Format final results with provenance
 
-- [ ] **Task 4.8:** Create POST /api/query Endpoint
-  - [ ] Wire recall_operation to REST endpoint
-  - [ ] Test with various query types
-  - [ ] Verify <250ms latency target
+- [X] **Task 4.8:** Create POST /api/query Endpoint
+  - [X] Wire recall_operation to REST endpoint
+  - [X] Test with various query types
+  - [X] Verify <250ms latency target
 
 **Deliverable:** Full 3-path query engine with intelligent ranking
 
@@ -330,8 +330,8 @@
 
 ### Redis Caching Layer
 
-- [ ] **Task 5.1:** Implement Query Cache
-  - [ ] `performance/query_cache.py`:
+- [X] **Task 5.1:** Implement Query Cache
+  - [X] `src/performance/query_cache.py`:
     - Generate cache key from query params (hash)
     - Check Redis before retrieval
     - If hit: return immediately
@@ -343,8 +343,8 @@
 
 ### Database Optimization
 
-- [ ] **Task 5.2:** Implement Index Manager
-  - [ ] `performance/index_manager.py`:
+- [X] **Task 5.2:** Implement Index Manager
+  - [X] `src/performance/index_manager.py`:
     - Create/manage indexes:
       - memory_id (primary)
       - agent_id (filtering)
@@ -354,24 +354,24 @@
     - Analyze query plans for 3 retrieval paths
     - Index rebalancing utilities
 
-- [ ] **Task 5.3:** Implement Query Optimizer
-  - [ ] `performance/query_optimizer.py`:
+- [X] **Task 5.3:** Implement Query Optimizer
+  - [X] `src/performance/query_optimizer.py`:
     - Query plan optimization
     - Index selection
     - Early termination strategies
 
 ### Performance Monitoring
 
-- [ ] **Task 5.4:** Implement Latency Tracker
-  - [ ] `performance/latency_tracker.py`:
+- [X] **Task 5.4:** Implement Latency Tracker
+  - [X] `src/performance/latency_tracker.py`:
     - Measure each path separately (semantic, keyword, graph)
     - Measure dedup + ranking time
     - Log to Cloud Logging with breakdown
     - Track p50, p95, p99 latencies
     - Alert mechanism if p95 > 250ms
 
-- [ ] **Task 5.5:** Implement Profiler
-  - [ ] `performance/profiler.py`:
+- [X] **Task 5.5:** Implement Profiler
+  - [X] `src/performance/profiler.py`:
     - Bottleneck identification
     - Memory usage tracking
     - Query performance analysis

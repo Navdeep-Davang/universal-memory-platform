@@ -5,11 +5,13 @@ from src.config.environment import settings
 from pydantic import BaseModel
 from typing import Dict, Any, List
 from src.operations.remember_operation import RememberOperation
+from src.operations.recall_operation import RecallOperation
 
 app = FastAPI(title="Universal Cognitive Memory Engine")
 
 # Initialize operations
 remember_op = RememberOperation()
+recall_op = RecallOperation()
 
 # CORS Middleware
 app.add_middleware(
@@ -37,6 +39,7 @@ class MemoryAddRequest(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str
+    agent_id: str
     limit: int = 10
 
 @app.get("/health")
@@ -69,8 +72,15 @@ async def get_memory(memory_id: str):
 
 @app.post("/api/query")
 async def query_memories(request: QueryRequest):
-    # Shell implementation
-    return {"results": []}
+    try:
+        results = await recall_op.execute(
+            query=request.query,
+            agent_id=request.agent_id,
+            limit=request.limit
+        )
+        return {"results": [res.model_dump() for res in results]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

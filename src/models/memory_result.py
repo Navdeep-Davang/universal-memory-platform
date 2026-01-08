@@ -1,4 +1,5 @@
-from typing import List, Annotated
+from datetime import datetime
+from typing import List, Annotated, Optional
 from pydantic import BaseModel, Field
 
 class MemoryResult(BaseModel):
@@ -9,4 +10,5 @@ class MemoryResult(BaseModel):
     paths_found: List[str] = Field(default_factory=list, description="List of traversal paths that led to this memory")
     confidence: Annotated[float, Field(ge=0.0, le=1.0)] = Field(..., description="Confidence score of the memory")
     provenance: str = Field(..., description="The origin or source of this memory (e.g., session ID, file name)")
+    created_at: Optional[datetime] = Field(None, description="The timestamp when the memory was created")
 
