@@ -9,6 +9,7 @@ from src.storage.adapters.llm_adapter import LLMAdapter
 from src.storage.adapters.cache_adapter import CacheAdapter
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
 
+from src.config.environment import settings
 from src.strata.experiential_stratum import ExperientialStratum
 from src.strata.contextual_stratum import ContextualStratum
 from src.strata.abstract_stratum import AbstractStratum
@@ -41,7 +42,9 @@ class IngestEngine:
         agent_id: str, 
         session_id: str, 
         memory_type: MemoryType = MemoryType.EPISODIC,
-        metadata: Dict[str, Any] = None
+        metadata: Dict[str, Any] = None,
+        entities: Optional[List[Dict[str, Any]]] = None,
+        principles: Optional[List[Dict[str, Any]]] = None
     ) -> Experience:
         """
         Orchestrate the ingestion flow:
@@ -80,31 +83,51 @@ class IngestEngine:
         self.db.create_node("Experience", experience.model_dump())
         logger.debug(f"Created Experience node: {experience.id}")
         
-        # 4. Run Strata
+        return experience
+
+    async def enrich(
+        self,
+        experience: Experience,
+        entities: Optional[List[Dict[str, Any]]] = None,
+        principles: Optional[List[Dict[str, Any]]] = None
+    ):
+        """
+        Background enrichment task:
+        1. Experiential Stratum (Entities)
+        2. Contextual Stratum (Clustering)
+        3. Abstract Stratum (Principles)
+        4. Conflict Detection
+        """
+        logger.info(f"Background enrichment starting for experience {experience.id}")
         try:
-            # Run in sequence for now to ensure consistency, 
-            # though some could potentially be parallelized.
+            # Skip heavy processing if LITE_MODE is active and no pre-extracted data is provided
+            if settings.LITE_MODE and not entities and not principles:
+                logger.info(f"LITE_MODE active for {experience.id}: skipping enrichment.")
+                
+                # We still run contextual stratum as it only uses embeddings (not LLM)
+                context = await self.contextual.process(experience)
+                logger.debug(f"Contextual stratum processed: {context.id if context else 'None'}")
+                return
+
+            # Experiential: Entity extraction (or injection)
+            processed_entities = await self.experiential.process(experience, provided_entities=entities)
+            logger.debug(f"Experiential stratum processed for {experience.id}: {len(processed_entities)} entities")
             
-            # Experiential: Entity extraction
-            entities = await self.experiential.process(experience)
-            logger.debug(f"Experiential stratum processed: {len(entities)} entities found")
-            
-            # Contextual: Clustering
+            # Contextual: Clustering (Embedding based)
             context = await self.contextual.process(experience)
-            logger.debug(f"Contextual stratum processed: {context.id if context else 'None'}")
+            logger.debug(f"Contextual stratum processed for {experience.id}: {context.id if context else 'None'}")
             
-            # Abstract: Principle derivation
-            principles = await self.abstract.process(experience)
-            logger.debug(f"Abstract stratum processed: {len(principles)} principles derived")
+            # Abstract: Principle derivation (or injection)
+            processed_principles = await self.abstract.process(experience, provided_principles=principles)
+            logger.debug(f"Abstract stratum processed for {experience.id}: {len(processed_principles)} principles")
             
             # 5. Conflict Detection
-            conflicts = await self.contradict_op.execute(experience)
-            if conflicts:
-                logger.info(f"Detected {len(conflicts)} conflicts for experience {experience.id}")
+            if not settings.LITE_MODE:
+                conflicts = await self.contradict_op.execute(experience)
+                if conflicts:
+                    logger.info(f"Detected {len(conflicts)} conflicts for experience {experience.id}")
             
         except Exception as e:
-            logger.error(f"Error during strata processing: {e}")
-            # We might want to mark the experience as "partially processed" here
-            
-        return experience
+            logger.error(f"Error during background enrichment for {experience.id}: {e}")
+
 

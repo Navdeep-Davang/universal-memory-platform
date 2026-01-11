@@ -1,11 +1,9 @@
-import logging
+from loguru import logger
 from typing import List, Optional
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
 from src.core.graph_engine import GraphEngine
 from src.models.memory_result import MemoryResult
 from src.retrieval.utils import format_memory_result
-
-logger = logging.getLogger(__name__)
 
 class GraphRetriever:
     """

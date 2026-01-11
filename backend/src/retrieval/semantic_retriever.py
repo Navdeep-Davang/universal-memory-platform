@@ -20,23 +20,15 @@ class SemanticRetriever:
     ) -> List[MemoryResult]:
         """
         Perform a semantic search using Memgraph's vector index.
-        
-        Args:
-            query_embedding: The vector embedding of the query.
-            top_k: Number of results to return.
-            agent_id: Optional filter for a specific agent.
-            memory_type: Optional filter for memory type (episodic, semantic, etc.).
-            
-        Returns:
-            A list of MemoryResult objects.
         """
-        # Base query using Memgraph's vector.search
-        # Syntax: CALL vector.search(label, property, query_vector, top_k) YIELD node, similarity
+        index_name = "idx_Experience_embedding"
         
-        # We start with the vector search
+        # Base query using Memgraph's vector_search.search
+        # CALL vector_search.search(index_name, limit, query_vector) YIELD node, similarity
         cypher = (
-            "CALL vector.search('Experience', 'embedding', $embedding, $top_k) "
+            f"CALL vector_search.search('{index_name}', $top_k, $embedding) "
             "YIELD node, similarity "
+            "WITH node, similarity "
         )
         
         params = {

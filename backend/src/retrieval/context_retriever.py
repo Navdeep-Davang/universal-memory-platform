@@ -1,4 +1,5 @@
 from typing import List, Optional
+from loguru import logger
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
 from src.models.memory_result import MemoryResult
 from src.retrieval.utils import format_memory_result
@@ -19,66 +20,67 @@ class ContextRetriever:
     ) -> List[MemoryResult]:
         """
         Perform a full-text search for keywords in experience content and entity names.
-        
-        Args:
-            keyword: The search term or phrase.
-            top_k: Number of results to return.
-            agent_id: Optional filter for a specific agent.
-            
-        Returns:
-            A combined list of MemoryResult objects from Experience and Entity matches.
         """
         memory_results = []
+        exp_index = "idx_Experience_content"
+        ent_index = "idx_Entity_name"
         
         # 1. Search in Experience content
-        # CALL text.index.search(index_name, query, limit) YIELD node, score
+        # Using search_all as search currently throws 'Unknown exception!' in Memgraph v3.7
         experience_cypher = (
-            "CALL text.index.search('Experience', $keyword, $top_k) "
-            "YIELD node, score "
+            f"CALL text_search.search_all('{exp_index}', $keyword) "
+            "YIELD node "
+            "WITH node "
         )
         
-        exp_params = {"keyword": keyword, "top_k": top_k}
+        exp_params = {"keyword": keyword}
         
         if agent_id:
             experience_cypher += "WHERE node.agent_id = $agent_id "
             exp_params["agent_id"] = agent_id
             
-        experience_cypher += "RETURN node, score"
+        experience_cypher += "RETURN node"
         
-        exp_results = self.adapter.run_query(experience_cypher, exp_params)
-        for res in exp_results:
-            memory_results.append(
-                format_memory_result(
-                    record={"n": res["node"]},
-                    score=res["score"],
-                    layer=res["node"].get("memory_type", "episodic")
+        try:
+            exp_results = self.adapter.run_query(experience_cypher, exp_params)
+            for res in exp_results:
+                memory_results.append(
+                    format_memory_result(
+                        record={"n": res["node"]},
+                        score=1.0,  # search_all doesn't return score
+                        layer=res["node"].get("memory_type", "episodic")
+                    )
                 )
-            )
+        except Exception as e:
+            logger.error(f"Error in Experience FTS search: {e}")
             
-        # 2. Search in Entity names (limited context)
-        # Note: Entities don't have 'content' like Experience, but we can treat 
-        # their name/type as content for retrieval purposes.
+        # 2. Search in Entity names
         entity_cypher = (
-            "CALL text.index.search('Entity', $keyword, $top_k) "
-            "YIELD node, score "
-            "RETURN node, score"
+            f"CALL text_search.search_all('{ent_index}', $keyword) "
+            "YIELD node "
+            "RETURN node"
         )
         
-        ent_results = self.adapter.run_query(entity_cypher, {"keyword": keyword, "top_k": top_k})
-        for res in ent_results:
-            node = res["node"]
-            # Convert entity to a memory-like result
-            memory_results.append(
-                MemoryResult(
-                    id=str(node.get("id", "unknown")),
-                    content=f"Entity: {node.get('name', '')} (Type: {node.get('type', 'Unknown')})",
-                    score=float(res["score"]),
-                    layer="semantic", # Entities are semantic knowledge
-                    paths_found=[],
-                    confidence=float(node.get("importance_score", 0.5)),
-                    provenance="graph_entity"
+        try:
+            ent_results = self.adapter.run_query(entity_cypher, {"keyword": keyword})
+            for res in ent_results:
+                node = res["node"]
+                # Convert entity to a memory-like result
+                node_id = str(node.get("id") or node.get("name") or "unknown")
+                
+                memory_results.append(
+                    MemoryResult(
+                        id=node_id,
+                        content=f"Entity: {node.get('name', '')} (Type: {node.get('type', 'Unknown')})",
+                        score=1.0, # search_all doesn't return score
+                        layer="semantic",
+                        paths_found=[],
+                        confidence=float(node.get("importance_score", 0.5)),
+                        provenance="graph_entity"
+                    )
                 )
-            )
+        except Exception as e:
+            logger.error(f"Error in Entity FTS search: {e}")
             
         # Sort combined results by score and limit
         memory_results.sort(key=lambda x: x.score, reverse=True)

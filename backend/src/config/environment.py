@@ -22,8 +22,11 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_NAME: str = "text-embedding-3-small"
     OPENAI_API_KEY: Optional[str] = None
     LLM_PROVIDER: str = "openai"
-    LLM_MODEL: str = "gpt-4o"
+    LLM_MODEL: str = "gpt-5-mini"
     REDIS_URL: str = "redis://localhost:6379/0"
+    
+    # Lite Mode
+    LITE_MODE: bool = False  # If True, minimizes internal LLM usage
     
     # Security
     API_KEY: str = "dev-key-123"  # Default for development

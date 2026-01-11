@@ -1,9 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 from neo4j import GraphDatabase, Driver, Session
-import logging
+from loguru import logger
 import time
-
-logger = logging.getLogger(__name__)
 
 class GraphDBAdapter:
     """
@@ -21,18 +19,21 @@ class GraphDBAdapter:
         if not self.driver:
             auth = (self.user, self.password) if self.user and self.password else None
             max_retries = 5
+            logger.info(f"Attempting to connect to Graph DB at {self.uri}")
             for attempt in range(max_retries):
                 try:
                     self.driver = GraphDatabase.driver(self.uri, auth=auth)
                     self.driver.verify_connectivity()
-                    logger.info(f"Connected to Graph DB at {self.uri}")
+                    logger.success(f"Successfully connected to Graph DB at {self.uri}")
                     break
                 except Exception as e:
                     if attempt == max_retries - 1:
-                        logger.error(f"Failed to connect to Graph DB after {max_retries} attempts: {e}")
+                        logger.error(f"CRITICAL: Failed to connect to Graph DB at {self.uri} after {max_retries} attempts.")
+                        logger.error(f"Error details: {e}")
+                        logger.info("Check if Docker containers are running and the port is correct.")
                         raise
                     wait_time = 2 ** attempt
-                    logger.warning(f"Connection attempt {attempt + 1} failed. Retrying in {wait_time}s... Error: {e}")
+                    logger.warning(f"Connection attempt {attempt + 1} failed for {self.uri}. Retrying in {wait_time}s... Error: {e}")
                     time.sleep(wait_time)
 
     def disconnect(self):
@@ -41,6 +42,17 @@ class GraphDBAdapter:
             self.driver.close()
             self.driver = None
             logger.info("Disconnected from Graph DB")
+
+    def initialize_database(self):
+        """Initialize the database by loading modules and ensuring basic setup."""
+        logger.info("Initializing Graph DB (loading modules)...")
+        try:
+            self.run_query("CALL mg.load_all();")
+            logger.success("Graph DB modules loaded successfully.")
+        except Exception as e:
+            logger.error(f"Failed to load Graph DB modules: {e}")
+            # We don't raise here as some environments might not support mg.load_all()
+            # but we want to know about it.
 
     def run_query(self, query: str, parameters: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
@@ -88,6 +100,22 @@ class GraphDBAdapter:
         s_label = f":{source_label}" if source_label else ""
         t_label = f":{target_label}" if target_label else ""
         
+        # Ensure edge_type is a string if it's an Enum
+        if hasattr(edge_type, "value"):
+            edge_type = edge_type.value
+
+        # Recursively convert Enums in properties to their values
+        def sanitize_props(obj):
+            if isinstance(obj, dict):
+                return {k: sanitize_props(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [sanitize_props(i) for i in obj]
+            elif hasattr(obj, "value"):
+                return obj.value
+            return obj
+
+        sanitized_props = sanitize_props(properties or {})
+        
         query = (
             f"MATCH (a{s_label} {{{id_property}: $source_id}}), "
             f"(b{t_label} {{{id_property}: $target_id}}) "
@@ -97,7 +125,7 @@ class GraphDBAdapter:
         result = self.run_query(query, {
             "source_id": source_id,
             "target_id": target_id,
-            "props": properties or {}
+            "props": sanitized_props
         })
         return result[0]["r"] if result else {}
 

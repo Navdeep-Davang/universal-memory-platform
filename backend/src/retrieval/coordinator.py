@@ -1,8 +1,6 @@
-import logging
+from loguru import logger
 from typing import List, Dict, Optional
 from src.models.memory_result import MemoryResult
-
-logger = logging.getLogger(__name__)
 
 class RetrievalCoordinator:
     """

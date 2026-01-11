@@ -23,8 +23,10 @@ class ContradictionDetector:
         logger.info(f"Searching for conflict candidates for experience {experience.id}")
         
         # Use Memgraph vector search to find similar experiences
+        # Using the correct Memgraph v3.7 procedure
         query = """
-        CALL vector.search(:Experience, 'embedding', $embedding, $limit) YIELD node, similarity
+        CALL vector_search.search('idx_Experience_embedding', $limit, $embedding) YIELD node, similarity
+        WITH node, similarity
         WHERE node.id <> $experience_id AND similarity >= $threshold
         RETURN node, similarity
         """

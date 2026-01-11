@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.middleware import LoggingMiddleware, ApiKeyMiddleware, RateLimitMiddleware, error_handler_middleware
 from src.config.environment import settings
@@ -51,11 +51,14 @@ class MemoryAddRequest(BaseModel):
     session_id: str = Field(..., description="Unique identifier for the conversation session", json_schema_extra={"example": "session-123"})
     memory_type: str = Field("episodic", description="Type of memory (episodic, semantic, etc.)", json_schema_extra={"example": "episodic"})
     metadata: Dict[str, Any] = Field(default={}, description="Additional structured metadata", json_schema_extra={"example": {"category": "preference"}})
+    entities: Optional[List[Dict[str, Any]]] = Field(default=None, description="Pre-extracted entities (optional)")
+    principles: Optional[List[Dict[str, Any]]] = Field(default=None, description="Pre-extracted principles (optional)")
 
 class QueryRequest(BaseModel):
     query: str = Field(..., description="The natural language query to search for", json_schema_extra={"example": "What does the user like?"})
     agent_id: str = Field(..., description="The agent whose memories to search", json_schema_extra={"example": "agent-001"})
     limit: int = Field(10, description="Maximum number of results to return", json_schema_extra={"example": 10})
+    entities: Optional[List[str]] = Field(default=None, description="Pre-extracted entity names for graph search (optional)")
 
 class ConflictResolveRequest(BaseModel):
     status: str = Field(..., description="The resolution status (e.g., active, superseded)", json_schema_extra={"example": "superseded"})
@@ -70,7 +73,7 @@ async def health_check():
     return {"status": "ok"}
 
 @app.post("/api/memories/add", tags=["Memories"], summary="Add a new memory")
-async def add_memory(request: MemoryAddRequest):
+async def add_memory(request: MemoryAddRequest, background_tasks: BackgroundTasks):
     """
     Stores a new memory experience in the engine.
     The engine will process the content, extract features, and store it across relevant strata.
@@ -81,7 +84,10 @@ async def add_memory(request: MemoryAddRequest):
             agent_id=request.agent_id,
             session_id=request.session_id,
             memory_type=request.memory_type,
-            metadata=request.metadata
+            metadata=request.metadata,
+            entities=request.entities,
+            principles=request.principles,
+            background_tasks=background_tasks
         )
         return {
             "status": "added", 
@@ -110,7 +116,8 @@ async def query_memories(request: QueryRequest):
         results = await recall_op.execute(
             query=request.query,
             agent_id=request.agent_id,
-            limit=request.limit
+            limit=request.limit,
+            entities=request.entities
         )
         return {"results": [res.model_dump() for res in results]}
     except Exception as e:

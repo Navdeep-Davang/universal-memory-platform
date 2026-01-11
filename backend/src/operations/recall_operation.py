@@ -57,7 +57,8 @@ class RecallOperation:
         query: str,
         agent_id: str,
         limit: int = 10,
-        metadata_filter: Optional[Dict[str, Any]] = None
+        metadata_filter: Optional[Dict[str, Any]] = None,
+        entities: Optional[List[str]] = None
     ) -> List[MemoryResult]:
         """
         Execute the recall operation.
@@ -67,6 +68,7 @@ class RecallOperation:
             agent_id: The ID of the agent performing the search.
             limit: Total number of results to return.
             metadata_filter: Optional filters for memory metadata.
+            entities: Pre-extracted entity names (optional).
             
         Returns:
             A list of ranked MemoryResult objects.
@@ -85,15 +87,24 @@ class RecallOperation:
                 # 1. Query Preprocessing (Embedding & Entities)
                 # Run concurrently to save time
                 with tracker.track("preprocessing"):
-                    logger.debug("Recall Operation: Generating query embedding and extracting entities")
+                    logger.debug("Recall Operation: Generating query embedding")
                     embedding_task = asyncio.to_thread(self.embedding_adapter.embed_text, query)
-                    entity_task = self.llm_adapter.extract_entities(query)
                     
-                    query_embedding, raw_entities = await asyncio.gather(embedding_task, entity_task)
+                    if entities:
+                        logger.debug(f"Recall Operation: Using {len(entities)} provided entities")
+                        query_embedding = await embedding_task
+                        entity_names = entities
+                    elif not settings.LITE_MODE:
+                        logger.debug("Recall Operation: Extracting entities for graph search")
+                        entity_task = self.llm_adapter.extract_entities(query)
+                        query_embedding, raw_entities = await asyncio.gather(embedding_task, entity_task)
+                        entity_names = [ent["name"] for ent in raw_entities] if raw_entities else []
+                    else:
+                        logger.debug("LITE_MODE active: skipping entity extraction")
+                        query_embedding = await embedding_task
+                        entity_names = []
                     
-                    # Extract just the names for the graph retriever
-                    entity_names = [ent["name"] for ent in raw_entities] if raw_entities else []
-                    logger.debug(f"Recall Operation: Extracted {len(entity_names)} entities: {entity_names}")
+                    logger.debug(f"Recall Operation: Preprocessing complete. Entities: {len(entity_names)}")
                 
                 # 2. Parallel retrieval from multiple paths
                 with tracker.track("multi_path_retrieval"):

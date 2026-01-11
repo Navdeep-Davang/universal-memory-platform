@@ -1,4 +1,4 @@
-version: '3.8'
+name: universal-memory-engine
 
 services:
   memgraph:
@@ -8,7 +8,7 @@ services:
       - "7687:7687"
       - "7444:7444"
     # Memgraph requires some extra flags for optimal performance/MAGE usage
-    entrypoint: ["/usr/lib/memgraph/memgraph", "--log-level=INFO"]
+    command: ["--log-level=INFO"]
 
   redis:
     image: redis:latest

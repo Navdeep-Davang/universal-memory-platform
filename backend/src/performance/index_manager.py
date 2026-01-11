@@ -1,8 +1,6 @@
-import logging
+from loguru import logger
 from typing import List, Dict, Any, Optional
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class PerformanceIndexManager:
     """
@@ -25,48 +23,61 @@ class PerformanceIndexManager:
         M: Max number of outgoing connections in the graph.
         ef_construction: Size of the dynamic candidate list during index building.
         """
-        logger.info(f"Tuning HNSW index for {label}({property_name})...")
+        index_name = f"idx_{label}_{property_name}"
+        logger.info(f"Tuning HNSW index {index_name} for {label}({property_name})...")
         
-        # In Memgraph, HNSW parameters are often set during creation.
-        # If the index exists, we might need to drop and recreate it to change parameters.
-        
-        drop_query = f"DROP INDEX ON :{label}({property_name});"
+        # 1. Drop existing if any
+        try:
+            self.adapter.run_query(f"DROP VECTOR INDEX {index_name};")
+        except:
+            pass
+            
+        # 2. Create using Native Cypher command (Memgraph v3.7+)
+        # We assume 1536 dimensions for text-embedding-3-small
+        # Memgraph v3.7 might require at least one node to exist or be created for some vector index configurations
         create_query = (
-            f"CREATE INDEX ON :{label}({property_name}) "
-            f"TYPE VECTOR "
-            f"PARAMS {{ m: {m}, ef_construction: {ef_construction} }};"
+            f"CREATE VECTOR INDEX {index_name} "
+            f"ON :{label}({property_name}) "
+            f'WITH CONFIG {{"dimension": 1536, "metric": "cos", "capacity": 1000, "scalar_kind": "f32"}};'
         )
         
         try:
-            # We try to drop if exists (ignore error if not exists)
-            try:
-                self.adapter.run_query(drop_query)
-            except:
-                pass
-                
+            # Optional: Create a temporary node to ensure the label/property exists if graph is empty
+            # Generating a list of zeros for the embedding
+            dummy_embedding = [0.0] * 1536
+            self.adapter.run_query(
+                f"CREATE (:{label} {{ {property_name}: $emb }});", 
+                {"emb": dummy_embedding}
+            )
             self.adapter.run_query(create_query)
-            logger.info("HNSW index tuned successfully.")
+            # Delete the temporary node after index creation
+            self.adapter.run_query(f"MATCH (n:{label}) WHERE n.{property_name} = $emb DELETE n;", {"emb": dummy_embedding})
+            logger.info(f"HNSW index {index_name} created successfully.")
         except Exception as e:
-            logger.error(f"Failed to tune HNSW index: {e}")
+            logger.error(f"Failed to create HNSW index: {e}")
 
     def optimize_fts_index(self, label: str = "Experience", properties: List[str] = ["content"]):
         """
-        Optimizes Full-Text Search index.
+        Optimizes Full-Text Search index using Native Cypher command.
         """
-        logger.info(f"Optimizing FTS index for {label} properties {properties}...")
-        
-        # Memgraph FTS (text.index) optimization usually involves ensuring 
-        # it's correctly built on the right properties.
-        
-        props_str = ", ".join([f"'{p}'" for p in properties])
-        query = f"CALL text.index.create('{label}', [{props_str}]);"
-        
-        try:
-            self.adapter.run_query(query)
-            logger.info("FTS index created/optimized.")
-        except Exception as e:
-            # If already exists, we might want to rebuild or just log
-            logger.debug(f"FTS index creation info: {e}")
+        for prop in properties:
+            index_name = f"idx_{label}_{prop}"
+            logger.info(f"Optimizing FTS index {index_name} for {label}.{prop}...")
+            
+            # 1. Drop existing if any
+            try:
+                self.adapter.run_query(f"DROP TEXT INDEX {index_name};")
+            except:
+                pass
+
+            # 2. Create using Native Cypher command
+            query = f"CREATE TEXT INDEX {index_name} ON :{label}({prop});"
+            
+            try:
+                self.adapter.run_query(query)
+                logger.info(f"FTS index {index_name} created successfully.")
+            except Exception as e:
+                logger.error(f"FTS index creation failed: {e}")
 
     def get_index_health(self) -> List[Dict[str, Any]]:
         """Checks the status and health of all database indexes."""

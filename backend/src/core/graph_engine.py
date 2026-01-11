@@ -1,8 +1,6 @@
-import logging
+from loguru import logger
 from typing import List, Dict, Any, Optional, Set
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class GraphEngine:
     """

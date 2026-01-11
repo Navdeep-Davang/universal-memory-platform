@@ -1,10 +1,8 @@
-import logging
-from typing import List, Optional
+from loguru import logger
+from typing import List, Optional, Any
 from src.models.nodes import Experience, Context
 from src.models.edges import Edge, RelationshipType
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class ContextualStratum:
     """
@@ -12,7 +10,7 @@ class ContextualStratum:
     Clusters experiences into contexts based on semantic similarity.
     """
 
-    def __init__(self, db_adapter: GraphDBAdapter, embedding_adapter: Optional[any] = None):
+    def __init__(self, db_adapter: GraphDBAdapter, embedding_adapter: Optional[Any] = None):
         self.db = db_adapter
         self.embedding_adapter = embedding_adapter
 
@@ -51,7 +49,7 @@ class ContextualStratum:
         self.db.create_edge(
             source_id=experience.id,
             target_id=context.id,
-            edge_type=RelationshipType.BELONGS_TO,
+            edge_type=RelationshipType.BELONGS_TO.value,
             properties=edge.model_dump(),
             source_label="Experience",
             target_label="Context",
@@ -71,8 +69,10 @@ class ContextualStratum:
         try:
             # Memgraph vector search query
             # We search for the most similar experience and return its context
+            # Using the correct Memgraph v3.7 procedure
             query = """
-            CALL vector.search(:Experience, 'embedding', $embedding, 5) YIELD node, similarity
+            CALL vector_search.search('idx_Experience_embedding', 5, $embedding) YIELD node, similarity
+            WITH node, similarity
             MATCH (node)-[:BELONGS_TO]->(c:Context)
             RETURN c, similarity
             ORDER BY similarity DESC
@@ -88,4 +88,3 @@ class ContextualStratum:
             logger.error(f"Error during vector search for context: {e}")
             
         return None
-

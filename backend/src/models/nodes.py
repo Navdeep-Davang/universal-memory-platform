@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import List, Dict, Optional, Annotated
+from typing import List, Dict, Optional, Annotated, Any
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
+import neo4j
 
 class MemoryType(str, Enum):
     EPISODIC = "episodic"
@@ -26,9 +27,15 @@ class BaseNode(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    @field_validator("updated_at", mode="before")
+    @field_validator("created_at", "updated_at", mode="before")
     @classmethod
-    def set_updated_at(cls, v):
+    def convert_neo4j_datetime(cls, v: Any) -> Any:
+        if isinstance(v, neo4j.time.DateTime):
+            return datetime(
+                v.year, v.month, v.day, 
+                v.hour, v.minute, int(v.second), 
+                int(v.nanosecond / 1000)
+            )
         return v or datetime.utcnow()
 
 class Entity(BaseNode):

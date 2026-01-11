@@ -1,13 +1,11 @@
-import logging
+from loguru import logger
 import json
 import re
 import hashlib
-from typing import List, Optional
+from typing import List, Optional, Any
 from src.models.nodes import Experience, Principle
 from src.models.edges import Edge, RelationshipType
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class AbstractStratum:
     """
@@ -15,21 +13,25 @@ class AbstractStratum:
     Extracts high-level principles and causal relationships.
     """
 
-    def __init__(self, db_adapter: GraphDBAdapter, llm_adapter: Optional[any] = None):
+    def __init__(self, db_adapter: GraphDBAdapter, llm_adapter: Optional[Any] = None):
         self.db = db_adapter
         self.llm = llm_adapter
 
-    async def process(self, experience: Experience) -> List[Principle]:
+    async def process(self, experience: Experience, provided_principles: Optional[List[dict]] = None) -> List[Principle]:
         """
         Processes an experience for abstract reasoning:
-        1. Derives principles or patterns from the experience using LLM.
+        1. Derives principles or patterns from the experience using LLM (or uses provided ones).
         2. Links principles to the experience.
         3. Detects causal links between this and other experiences/principles.
         """
         logger.info(f"Processing experience {experience.id} in Abstract Stratum")
         
-        # 1. Derive principles using LLM
-        derived_principles = await self._derive_principles(experience.content)
+        # 1. Use provided principles or derive them using LLM
+        if provided_principles:
+            logger.debug(f"Using {len(provided_principles)} provided principles for experience {experience.id}")
+            derived_principles = provided_principles
+        else:
+            derived_principles = await self._derive_principles(experience.content)
         
         processed_principles = []
         for principle_data in derived_principles:
@@ -69,7 +71,7 @@ class AbstractStratum:
             self.db.create_edge(
                 source_id=experience.id,
                 target_id=principle.id,
-                edge_type=RelationshipType.SUPPORTS,
+                edge_type=RelationshipType.SUPPORTS.value,
                 properties=edge.model_dump(),
                 source_label="Experience",
                 target_label="Principle",
@@ -125,4 +127,3 @@ Return ONLY a JSON array of objects. Example:
         Reserved for future iterations.
         """
         pass
-

@@ -1,9 +1,7 @@
-import logging
+from loguru import logger
 import time
 from typing import List, Dict, Any, Optional
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class QueryOptimizer:
     """

@@ -20,21 +20,29 @@ class AgenticMemory:
         agent_id: str, 
         session_id: str, 
         memory_type: str = "episodic", 
-        metadata: Dict[str, Any] = None
+        metadata: Dict[str, Any] = None,
+        entities: Optional[List[Dict[str, Any]]] = None,
+        principles: Optional[List[Dict[str, Any]]] = None
     ) -> Dict[str, Any]:
         """
         Stores a new memory.
         """
         async with httpx.AsyncClient() as client:
+            payload = {
+                "content": content,
+                "agent_id": agent_id,
+                "session_id": session_id,
+                "memory_type": memory_type,
+                "metadata": metadata or {}
+            }
+            if entities:
+                payload["entities"] = entities
+            if principles:
+                payload["principles"] = principles
+                
             response = await client.post(
                 f"{self.base_url}/api/memories/add",
-                json={
-                    "content": content,
-                    "agent_id": agent_id,
-                    "session_id": session_id,
-                    "memory_type": memory_type,
-                    "metadata": metadata or {}
-                },
+                json=payload,
                 headers=self._headers
             )
             response.raise_for_status()
@@ -44,19 +52,24 @@ class AgenticMemory:
         self, 
         query: str, 
         agent_id: str, 
-        limit: int = 10
+        limit: int = 10,
+        entities: Optional[List[str]] = None
     ) -> List[Dict[str, Any]]:
         """
         Retrieves relevant memories based on a query.
         """
         async with httpx.AsyncClient() as client:
+            payload = {
+                "query": query,
+                "agent_id": agent_id,
+                "limit": limit
+            }
+            if entities:
+                payload["entities"] = entities
+                
             response = await client.post(
                 f"{self.base_url}/api/query",
-                json={
-                    "query": query,
-                    "agent_id": agent_id,
-                    "limit": limit
-                },
+                json=payload,
                 headers=self._headers
             )
             response.raise_for_status()

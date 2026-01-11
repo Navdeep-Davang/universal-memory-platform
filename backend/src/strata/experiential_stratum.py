@@ -1,12 +1,10 @@
-import logging
+from loguru import logger
 import json
 import re
-from typing import List, Optional
+from typing import List, Optional, Any
 from src.models.nodes import Experience, Entity
 from src.models.edges import Edge, RelationshipType
 from src.storage.adapters.graph_db_adapter import GraphDBAdapter
-
-logger = logging.getLogger(__name__)
 
 class ExperientialStratum:
     """
@@ -14,21 +12,25 @@ class ExperientialStratum:
     Extracts entities from raw experiences and links them.
     """
 
-    def __init__(self, db_adapter: GraphDBAdapter, llm_adapter: Optional[any] = None):
+    def __init__(self, db_adapter: GraphDBAdapter, llm_adapter: Optional[Any] = None):
         self.db = db_adapter
         self.llm = llm_adapter
 
-    async def process(self, experience: Experience) -> List[Entity]:
+    async def process(self, experience: Experience, provided_entities: Optional[List[dict]] = None) -> List[Entity]:
         """
         Processes a raw experience:
-        1. Extracts entities from the content.
+        1. Extracts entities from the content (or uses provided entities).
         2. Checks for existing entities in the graph.
         3. Creates/updates entities and links them to the experience.
         """
         logger.info(f"Processing experience {experience.id} in Experiential Stratum")
         
-        # 1. Extract entities using LLM (if available)
-        extracted_entities = await self._extract_entities(experience.content)
+        # 1. Use provided entities or extract them using LLM
+        if provided_entities:
+            logger.debug(f"Using {len(provided_entities)} provided entities for experience {experience.id}")
+            extracted_entities = provided_entities
+        else:
+            extracted_entities = await self._extract_entities(experience.content)
         
         processed_entities = []
         for entity_data in extracted_entities:
@@ -69,7 +71,7 @@ class ExperientialStratum:
             self.db.create_edge(
                 source_id=experience.id, 
                 target_id=entity.id, 
-                edge_type=RelationshipType.MENTIONS,
+                edge_type=RelationshipType.MENTIONS.value,
                 properties=edge.model_dump(),
                 source_label="Experience",
                 target_label="Entity",
@@ -117,4 +119,3 @@ Return ONLY a JSON array of objects. Example:
         except Exception as e:
             logger.error(f"Failed to parse JSON response from LLM: {e}. Response was: {response_text}")
             return []
-
