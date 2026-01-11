@@ -18,9 +18,11 @@ class Settings(BaseSettings):
     DEFAULT_RECALL_BREADTH: int = 50
 
     # Ingestion & Infrastructure
-    EMBEDDING_MODEL_NAME: str = "all-MiniLM-L6-v2"
+    USE_OPENAI_EMBEDDING: bool = True
+    EMBEDDING_MODEL_NAME: str = "text-embedding-3-small"
     OPENAI_API_KEY: Optional[str] = None
-    ANTHROPIC_API_KEY: Optional[str] = None
+    LLM_PROVIDER: str = "openai"
+    LLM_MODEL: str = "gpt-4o"
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Security

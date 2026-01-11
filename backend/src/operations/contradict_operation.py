@@ -19,7 +19,7 @@ class ContradictOperation:
             user=settings.MEMGRAPH_USERNAME,
             password=settings.MEMGRAPH_PASSWORD
         )
-        self.llm = llm_adapter or LLMAdapter(provider="openai")
+        self.llm = llm_adapter or LLMAdapter(provider=settings.LLM_PROVIDER, model=settings.LLM_MODEL)
         
         self.detector = ContradictionDetector(self.db, self.llm)
         self.analyzer = ConflictAnalyzer()

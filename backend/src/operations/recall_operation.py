@@ -32,7 +32,7 @@ class RecallOperation:
             password=settings.MEMGRAPH_PASSWORD
         )
         self.embedding_adapter = EmbeddingAdapter()
-        self.llm_adapter = LLMAdapter(provider="openai")
+        self.llm_adapter = LLMAdapter(provider=settings.LLM_PROVIDER, model=settings.LLM_MODEL)
         
         # Initialize specialized retrievers
         self.semantic = SemanticRetriever(self.db_adapter)

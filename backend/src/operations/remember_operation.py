@@ -19,7 +19,7 @@ class RememberOperation:
             password=settings.MEMGRAPH_PASSWORD
         )
         self.embedding_adapter = EmbeddingAdapter()
-        self.llm_adapter = LLMAdapter(provider="openai") # Default to OpenAI
+        self.llm_adapter = LLMAdapter(provider=settings.LLM_PROVIDER, model=settings.LLM_MODEL)
         self.cache_adapter = CacheAdapter()
         
         self.engine = IngestEngine(

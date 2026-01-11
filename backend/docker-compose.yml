@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  memgraph:
+    image: memgraph/memgraph-mage:latest
+    container_name: memgraph
+    ports:
+      - "7687:7687"
+      - "7444:7444"
+    # Memgraph requires some extra flags for optimal performance/MAGE usage
+    entrypoint: ["/usr/lib/memgraph/memgraph", "--log-level=INFO"]
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
